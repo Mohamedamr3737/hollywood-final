@@ -24,6 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _emergencyContactController = TextEditingController();
   
   bool _isEditing = false;
+  late final Worker _profileWorker;
 
   @override
   void initState() {
@@ -32,7 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
     controller.fetchProfile();
     
     // Listen to profile changes and update controllers
-    ever(controller.userData, (profile) {
+    _profileWorker = ever(controller.userData, (profile) {
       if (profile != null && profile.isNotEmpty) {
         _nameController.text = profile['name'] ?? '';
         _emailController.text = profile['email'] ?? '';
@@ -45,6 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
+    _profileWorker.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();

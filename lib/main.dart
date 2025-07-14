@@ -7,6 +7,8 @@ import 'app/auth/view/login_page.dart';
 import 'app/home/view/home.dart';
 import 'app/home/controller/profile_controller.dart';
 import 'app/home/controller/notifications_controller.dart';
+import 'app/widgets/splash_screen.dart';
+
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase if needed.
@@ -29,6 +31,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   var isLogin = false;
+  bool _showSplash = true;
 
   checkIfLogin() async {
       if (await getAccessToken()!=null) {
@@ -45,6 +48,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     checkIfLogin();
     super.initState();
+    // Hide splash after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        _showSplash = false;
+      });
+    });
   }
 
   @override
@@ -57,7 +66,15 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff4B2EAD)),
         useMaterial3: true,
       ),
-      home: isLogin ? const Home() : const LoginView(),
+      home: _showSplash
+          ? SplashScreen(
+              onFinish: () {
+                setState(() {
+                  _showSplash = false;
+                });
+              },
+            )
+          : (isLogin ? const Home() : const LoginView()),
     );
   }
 }
