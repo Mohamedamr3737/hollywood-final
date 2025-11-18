@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../controller/AppointmentsController.dart';
 import '../../../auth/controller/token_controller.dart'; // for refreshAccessToken()
-import '../../../../general/widgets/DateTimeSlotSelector.dart';
+import 'package:s_medi/general/services/alert_service.dart';
 
 class AppointmentDetailPage extends StatefulWidget {
   final Map<String, String> appointment;
@@ -75,9 +75,7 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
     try {
       final idStr = widget.appointment['id'];
       if (idStr == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Appointment ID is missing.")),
-        );
+        AlertService.error(context, "Appointment ID is missing.");
         return;
       }
 
@@ -85,300 +83,185 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
       final success = await appointmentsController.cancelAppointment(id: id);
       if (success) {
         // Return a Map<String, String> with a guaranteed non-null 'id'.
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Your Reservation time has been canceled.")),
-        );
+        AlertService.success(context, "Your Reservation time has been canceled.");
         Navigator.of(context).pop({
           'action': 'cancel',
           'id': widget.appointment['id'] ?? '',
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(appointmentsController.errorMessage.value)),
-        );
+        AlertService.error(context, appointmentsController.errorMessage.value);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      AlertService.error(context, "Error: $e");
     }
   }
 
-  /// Show date picker and set the date field.
-  Future<void> _pickDate() async {
-    final now = DateTime.now();
-    final selected = await showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: DateTime(now.year - 2),
-      lastDate: DateTime(now.year + 2),
-    );
-    if (selected != null) {
-      final y = selected.year.toString();
-      final m = selected.month.toString().padLeft(2, '0');
-      final d = selected.day.toString().padLeft(2, '0');
-      setState(() {
-        _dateCtrl.text = "$y-$m-$d";
-      });
-    }
-  }
-
-  /// Show time picker and set the time field.
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null) {
-      final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
-      final minute = picked.minute.toString().padLeft(2, '0');
-      final ampm = picked.period == DayPeriod.am ? "AM" : "PM";
-      setState(() {
-        _timeCtrl.text = "$hour:$minute $ampm";
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    // Prepare available dates (next 7 days)
-    final now = DateTime.now();
-    final availableDates = List<DateTime>.generate(7, (i) => now.add(Duration(days: i)));
-    DateTime? selectedDateObj = _dateCtrl.text.isNotEmpty ? DateTime.tryParse(_dateCtrl.text) : null;
-    String? selectedTime = _timeCtrl.text.isNotEmpty ? _timeCtrl.text : null;
-    // For demo: use static times, in real use, fetch from controller
-    final availableTimes = [
-      '8:00:00AM', '9:00:00AM', '10:00:00AM', '11:00:00AM',
-      '12:00:00PM', '1:00:00PM', '2:00:00PM', '3:00:00PM',
-      '4:00:00PM', '5:00:00PM', '6:00:00PM', '7:00:00PM',
-    ];
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
-      body: Column(
+      // Using a Stack to maintain your original design:
+      //  - top background image
+      //  - circular lotus icon
+      //  - custom AppBar
+      body: Stack(
         children: [
-          // Modern Header
-          Container(
-            height: 280,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF2E7D8F),
-                  Color(0xFF1A5F6F),
-                ],
-              ),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
-              image: DecorationImage(
-                image: const NetworkImage('https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9'),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  const Color(0xFF2E7D8F).withOpacity(0.8),
-                  BlendMode.overlay,
+          // (1) Background image at the top
+          Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 200,
+                child: Image.network(
+                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
                 ),
               ),
-            ),
-            child: Stack(
+              // Extra space to accommodate the circular icon
+              const SizedBox(height: 100),
+            ],
+          ),
+          // (2) Circular lotus icon
+          Positioned(
+            top: 140,
+            left: MediaQuery.of(context).size.width / 2 - 70,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                image: const DecorationImage(
+                  image: NetworkImage(
+                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            )
+
+          ),
+          // (3) The main content, below the circle
+          Positioned.fill(
+            top: 280,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               children: [
-                // AppBar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: const Text(
-                      'Edit Appointment',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    centerTitle: true,
+                const SizedBox(height: 8),
+                const Text(
+                  "Appointment Name",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                TextFormField(
+                  controller: _appointmentNameCtrl,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey,
                   ),
                 ),
-                // Circular Icon and Title
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.edit_calendar,
-                          size: 50,
-                          color: Color(0xFF2E7D8F),
-                        ),
+                const SizedBox(height: 16),
+
+                const Text("Doctor", style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                TextFormField(
+                  controller: _doctorCtrl,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                const Text("Department", style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                TextFormField(
+                  controller: _departmentCtrl,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                const Text("Date", style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                TextFormField(
+                  controller: _dateCtrl,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                const Text("Time", style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                TextFormField(
+                  controller: _timeCtrl,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+
+                const SizedBox(height: 16),
+
+                // Cancel Appointment button (full width)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _cancelAppointment,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Update Appointment Details',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text(
+                      "Cancel Appointment",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          // Content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Appointment Name Field
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Appointment Name",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _appointmentNameCtrl,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFF2E7D8F), width: 2),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Department Field
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Department",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _departmentCtrl,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFF2E7D8F), width: 2),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // DateTimeSlotSelector
-                  DateTimeSlotSelector(
-                    title: 'Edit Date & Time',
-                    availableDates: availableDates,
-                    availableTimes: availableTimes,
-                    selectedDate: selectedDateObj,
-                    selectedTime: selectedTime,
-                    onDateSelected: (date) {
-                      setState(() {
-                        _dateCtrl.text = date.toIso8601String().split('T')[0];
-                        _timeCtrl.text = '';
-                      });
-                    },
-                    onTimeSelected: (time) {
-                      setState(() {
-                        _timeCtrl.text = time;
-                      });
-                    },
-                    onConfirm: _saveChanges,
-                    confirmText: 'Save Changes',
-                  ),
-                  // Cancel Appointment Button
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 12),
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[600],
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        elevation: 2,
-                      ),
-                      onPressed: _cancelAppointment,
-                      icon: const Icon(Icons.cancel, size: 20),
-                      label: const Text(
-                        "Cancel Appointment",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+          // (4) Custom AppBar on top
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppBar(
+              backgroundColor: Colors.black.withOpacity(0.6),
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                onPressed: () => Navigator.of(context).pop(),
               ),
+              title: const Text(
+                "Appointment Details",
+                style: TextStyle(
+                  color: Colors.orangeAccent,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
             ),
           ),
         ],

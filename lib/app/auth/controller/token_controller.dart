@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import '../view/login_page.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 Future<void> storeTokens(String accessToken) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -48,7 +49,7 @@ Future<bool> checkLoginStatusBool() async {
 //   // Make the request to refresh the access token
 //   var response = await http.post(
 //     Uri.parse(
-//         'https://portal.ahmed-hussain.com/api/patient/auth/refresh'), // Replace with your API endpoint
+//         '${ApiConfig.baseUrl}/api/patient/auth/refresh'), // Replace with your API endpoint
 //     headers: {
 //       'Authorization':
 //           'Bearer $access_token', // Add the Bearer token to the header

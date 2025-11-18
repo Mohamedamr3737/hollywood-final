@@ -2,11 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:velocity_x/velocity_x.dart';
+import 'package:s_medi/general/services/alert_service.dart';
 import 'NewPasswordPage.dart';
-import '../../widgets/coustom_textfield.dart';
-import '../../widgets/coustom_button.dart';
-import '../../../general/consts/colors.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 class CodeVerificationPage extends StatefulWidget {
   final String username;
@@ -22,7 +20,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
   bool isLoading = false;
 
   Future<void> verifyCode() async {
-    final url = Uri.parse("https://portal.ahmed-hussain.com/api/patient/auth/check-otp");
+    final url = Uri.parse("${ApiConfig.baseUrl}/api/patient/auth/check-otp");
     setState(() {
       isLoading = true;
     });
@@ -34,19 +32,20 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse["status"] == true) {
-          VxToast.show(context, msg: jsonResponse["message"] ?? "Recovery code is valid.");
+          AlertService.success(context, jsonResponse["message"] ?? "Recovery code is valid.");
+          // Navigate to the NewPasswordPage with phone and otp.
           Get.to(() => NewPasswordPage(
             username: widget.username,
             otp: codeController.text,
           ));
         } else {
-          VxToast.show(context, msg: jsonResponse["message"] ?? "Incorrect verification code");
+          AlertService.error(context, jsonResponse["message"] ?? "Incorrect verification code");
         }
       } else {
-        VxToast.show(context, msg: "Server error: ${response.statusCode}");
+        AlertService.serverError(context, "Server error: ${response.statusCode}");
       }
     } catch (e) {
-      VxToast.show(context, msg: "Error: $e");
+      AlertService.error(context, "Error: $e");
     }
     setState(() {
       isLoading = false;
@@ -55,163 +54,70 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header Section
-            Container(
-              height: screenHeight * 0.3,
-              decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  // AppBar
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: AppBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      title: const Text(
-                        'Verification',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      centerTitle: true,
+      backgroundColor: Colors.white, // Professional white background.
+      appBar: AppBar(
+        title: const Text('Enter Code'),
+        backgroundColor: Colors.orangeAccent,
+        elevation: 0,
+      ),
+      body: Center(
+        child: Card(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                "Enter Verification Code".text.xl2.bold.make().pOnly(bottom: 16),
+                "Please enter the recovery code sent to your phone."
+                    .text.sm.make()
+                    .pOnly(bottom: 16),
+                TextField(
+                  controller: codeController,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.code),
+                    labelText: 'Verification Code',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  
-                  // Content
-                  Positioned(
-                    bottom: 30,
-                    left: 24,
-                    right: 24,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.verified_user,
-                            color: Colors.white,
-                            size: 32,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Enter Code',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Code sent to ${widget.username}',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
+                  keyboardType: TextInputType.number,
+                ).pOnly(bottom: 16),
+                ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () {
+                    if (codeController.text.isNotEmpty) {
+                      verifyCode();
+                    } else {
+                      AlertService.codeRequired(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                ],
-              ),
-            ),
-            
-            // Form Section
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceColor,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Verification Code',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Please enter the code we sent to your phone',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          
-                          CoustomTextField(
-                            label: 'Verification Code',
-                            textcontroller: codeController,
-                            icon: Icon(Icons.code_outlined, color: AppColors.primaryColor),
-                            hint: 'Enter verification code',
-                            keyboardType: TextInputType.number,
-                          ),
-                          
-                          const SizedBox(height: 32),
-                          
-                          CoustomButton(
-                            onTap: () {
-                              if (codeController.text.isNotEmpty) {
-                                verifyCode();
-                              } else {
-                                VxToast.show(context, msg: "Please enter the code");
-                              }
-                            },
-                            title: "Verify Code",
-                            isLoading: isLoading,
-                            width: double.infinity,
-                            icon: Icons.check_circle_outline,
-                          ),
-                        ],
-                      ),
+                  child: isLoading
+                      ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
                     ),
-                  ],
+                  )
+                      : "Verify Code".text.make(),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

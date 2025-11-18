@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 class OrdersController extends GetxController {
   var isLoading = false.obs;
@@ -37,7 +38,7 @@ class OrdersController extends GetxController {
       errorMessage('');
 
       final bearerToken = await getAccessToken();
-      final url = "https://portal.ahmed-hussain.com/api/patient/shop/orders";
+      final url = "${ApiConfig.baseUrl}/api/patient/shop/orders";
 
       final response = await http.get(
         Uri.parse(url),

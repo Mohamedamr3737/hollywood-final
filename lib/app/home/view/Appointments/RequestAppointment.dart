@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/AppointmentsController.dart';
-import '../../../../general/widgets/DateTimeSlotSelector.dart';
+import 'package:s_medi/general/services/alert_service.dart';
+import 'package:s_medi/general/widgets/custom_time_picker.dart';
 
 class RequestAppointmentPage extends StatefulWidget {
   final Function(Map<String, String>) onAppointmentAdded;
@@ -16,7 +17,6 @@ class RequestAppointmentPage extends StatefulWidget {
 }
 
 class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
-  final TextEditingController _appointmentNameCtrl = TextEditingController();
   final TextEditingController _dateCtrl = TextEditingController();
 
   // Selected values.
@@ -28,11 +28,9 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
   String? selectedBranch;
 
   // Static branch options and mapping.
-  final List<String> branchOptions = ["Heliopolis", "Branch X", "Branch Y"];
+  final List<String> branchOptions = ["Heliopolis"];
   final Map<String, int> branchMap = {
     "Heliopolis": 1,
-    "Branch X": 2,
-    "Branch Y": 3,
   };
 
   // Instantiate the AppointmentsController.
@@ -40,7 +38,6 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
 
   @override
   void dispose() {
-    _appointmentNameCtrl.dispose();
     _dateCtrl.dispose();
     super.dispose();
   }
@@ -90,111 +87,60 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
     return services.map((s) => s['title'].toString()).toList();
   }
 
+  Widget _buildCustomTimePicker() {
+    final timeOptions = getAvailableTimes();
+    final isEnabled = selectedDoctor != null && timeOptions.isNotEmpty;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Time",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: isEnabled ? Colors.black87 : Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 8),
+        CustomTimePicker(
+          timeOptions: timeOptions,
+          selectedTime: selectedTime,
+          enabled: isEnabled,
+          onTimeSelected: (val) {
+            setState(() {
+              selectedTime = val;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Prepare available dates (next 7 days)
-    final now = DateTime.now();
-    final availableDates = List<DateTime>.generate(7, (i) => now.add(Duration(days: i)));
-    DateTime? selectedDateObj = selectedDate != null ? DateTime.tryParse(selectedDate!) : null;
-    final availableTimes = getAvailableTimes();
-
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         child: Column(
           children: [
-            // DateTimeSlotSelector at the top
-            DateTimeSlotSelector(
-              title: 'Select Date & Time',
-              availableDates: availableDates,
-              availableTimes: availableTimes,
-              selectedDate: selectedDateObj,
-              selectedTime: selectedTime,
-              onDateSelected: (date) async {
+            // Appointment Name.
+            const SizedBox(height: 16),
+            // Date Field.
+            _buildDateField(
+              label: "Date",
+              controller: _dateCtrl,
+              onSelected: (val) async {
                 setState(() {
-                  selectedDate = date.toIso8601String().split('T')[0];
+                  selectedDate = val;
+                  _dateCtrl.text = val;
                   selectedDepartment = null;
                   selectedDoctor = null;
                   selectedService = null;
                   selectedTime = null;
                 });
-                await settingController.fetchSettings(selectedDate!);
+                await settingController.fetchSettings(val);
               },
-              onTimeSelected: (time) {
-                setState(() {
-                  selectedTime = time;
-                });
-              },
-              onConfirm: () async {
-                if (_appointmentNameCtrl.text.isEmpty ||
-                    selectedBranch == null ||
-                    selectedDepartment == null ||
-                    selectedService == null ||
-                    selectedDoctor == null ||
-                    selectedDate == null ||
-                    selectedTime == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Please fill in all fields")),
-                  );
-                  return;
-                }
-                try {
-                  final department = settingController.settings.firstWhere(
-                          (dept) => dept['title'] == selectedDepartment);
-                  final deptId = department['id'];
-                  final doctor = (department['doctor'] as List)
-                      .firstWhere((doc) => doc['name'] == selectedDoctor);
-                  final doctorId = doctor['id'];
-                  final service = (department['service'] as List)
-                      .firstWhere((serv) => serv['title'] == selectedService);
-                  final serviceId = service['id'];
-                  final branchId = branchMap[selectedBranch!] ?? 1;
-
-                  final success = await settingController.storeAppointment(
-                    date: selectedDate!,
-                    time: selectedTime!,
-                    doctorId: doctorId,
-                    serviceId: serviceId,
-                    deptId: deptId,
-                    branchId: branchId,
-                  );
-
-                  if (success) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text("Appointment saved successfully")),
-                    );
-                    // Signal parent to refresh appointments.
-                    widget.onAppointmentAdded({
-                      'appointmentName': _appointmentNameCtrl.text.trim(),
-                      'branch': selectedBranch!,
-                      'department': selectedDepartment!,
-                      'service': selectedService!,
-                      'doctor': selectedDoctor!,
-                      'date': selectedDate!,
-                      'time': selectedTime!,
-                    });
-                  }
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Error: \${e.toString()}")),
-                  );
-                }
-              },
-              confirmText: 'Confirm Appointment',
-            ),
-            const SizedBox(height: 16),
-            // Appointment Name.
-            TextFormField(
-              controller: _appointmentNameCtrl,
-              decoration: InputDecoration(
-                labelText: "Appointment Name",
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
             ),
             const SizedBox(height: 16),
             // Department Dropdown.
@@ -226,7 +172,8 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
               final doctorOptions = selectedDepartment != null
                   ? getAvailableDoctors()
                   : <String>[];
-              final isEnabled = selectedDepartment != null && doctorOptions.isNotEmpty;
+              final isEnabled = selectedDepartment != null &&
+                  doctorOptions.isNotEmpty;
               return _buildDropdownField(
                 label: "Doctor",
                 options: doctorOptions,
@@ -247,7 +194,8 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
               final serviceOptions = selectedDepartment != null
                   ? getAvailableServices()
                   : <String>[];
-              final isEnabled = selectedDepartment != null && serviceOptions.isNotEmpty;
+              final isEnabled = selectedDepartment != null &&
+                  serviceOptions.isNotEmpty;
               return _buildDropdownField(
                 label: "Service",
                 options: serviceOptions,
@@ -261,6 +209,12 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
               );
             }),
             const SizedBox(height: 16),
+            // Custom Time Picker.
+            Obx(() {
+              final dummy = settingController.settings.length;
+              return _buildCustomTimePicker();
+            }),
+            const SizedBox(height: 16),
             // Branch Dropdown.
             _buildDropdownField(
               label: "Branch",
@@ -272,6 +226,65 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
                   selectedBranch = val;
                 });
               },
+            ),
+            const SizedBox(height: 24),
+            // Confirm Appointment Button.
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              onPressed: () async {
+
+                try {
+                  final department = settingController.settings.firstWhere(
+                          (dept) => dept['title'] == selectedDepartment);
+                  final deptId = department['id'];
+                  final doctor = (department['doctor'] as List)
+                      .firstWhere((doc) => doc['name'] == selectedDoctor);
+                  final doctorId = doctor['id'];
+                  final service = (department['service'] as List)
+                      .firstWhere((serv) => serv['title'] == selectedService);
+                  final serviceId = service['id'];
+                  final branchId = branchMap[selectedBranch!] ?? 1;
+
+                  final success = await settingController.storeAppointment(
+                    date: selectedDate!,
+                    time: selectedTime!,
+                    doctorId: doctorId,
+                    serviceId: serviceId,
+                    deptId: deptId,
+                    branchId: branchId,
+                  );
+
+                  if (success) {
+                    AlertService.appointmentSuccess(context);
+                    // Signal parent to refresh appointments.
+                    widget.onAppointmentAdded({
+                      'branch': selectedBranch!,
+                      'department': selectedDepartment!,
+                      'service': selectedService!,
+                      'doctor': selectedDoctor!,
+                      'date': selectedDate!,
+                      'time': selectedTime!,
+                    });
+                  } else {
+                    AlertService.appointmentError(context, settingController.errorMessage.value);
+                  }
+                } catch (e) {
+                  AlertService.error(context, "Error: ${e.toString()}");
+                }
+              },
+              child: const Text(
+                "Confirm Appointment",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),

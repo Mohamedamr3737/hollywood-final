@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import './app/auth/controller/token_controller.dart';
-import './general/consts/consts.dart';
+import 'package:s_medi/general/consts/consts.dart';
 import 'app/auth/view/login_page.dart';
 import 'app/home/view/home.dart';
 import 'app/home/controller/profile_controller.dart';
 import 'app/home/controller/notifications_controller.dart';
-import 'app/widgets/splash_screen.dart';
-
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase if needed.
@@ -18,7 +16,13 @@ void main() async {
 
   Get.put(NotificationsController());
   runApp(
-    const MyApp(),
+
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProfileController()),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -31,7 +35,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   var isLogin = false;
-  bool _showSplash = true;
 
   checkIfLogin() async {
       if (await getAccessToken()!=null) {
@@ -48,12 +51,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     checkIfLogin();
     super.initState();
-    // Hide splash after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      setState(() {
-        _showSplash = false;
-      });
-    });
   }
 
   @override
@@ -65,16 +62,18 @@ class _MyAppState extends State<MyApp> {
         primaryColor: AppColors.primeryColor,
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff4B2EAD)),
         useMaterial3: true,
+        // Global page transition animations
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          },
+        ),
       ),
-      home: _showSplash
-          ? SplashScreen(
-              onFinish: () {
-                setState(() {
-                  _showSplash = false;
-                });
-              },
-            )
-          : (isLogin ? const Home() : const LoginView()),
+      // GetX global transition settings
+      defaultTransition: Transition.cupertino,
+      transitionDuration: const Duration(milliseconds: 300),
+      home: isLogin ? const Home() : const LoginView(),
     );
   }
 }

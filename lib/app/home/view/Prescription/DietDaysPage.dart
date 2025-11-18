@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'MyMealsPage.dart';
 import '../../controller/diet_controller.dart';
-import '../../../../general/consts/colors.dart';
 
 class DietDaysPage extends StatefulWidget {
   // Note: We use Map<String, dynamic> to include 'id' as an int
@@ -29,185 +28,119 @@ class _DietDaysPageState extends State<DietDaysPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Column(
+      // We'll replicate the same style: background + top bar
+      body: Stack(
         children: [
-          // Header Section
-          Container(
-            height: 280,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
+          // Top background
+          Column(
+            children: [
+              SizedBox(
+                height: 150,
+                width: double.infinity,
+                child: Image.network(
+                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            child: Stack(
-              children: [
-                // Background image with overlay
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                      image: DecorationImage(
-                        image: const NetworkImage(
-                          'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
-                        ),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.withOpacity(0.8),
-                          BlendMode.overlay,
-                        ),
-                      ),
-                    ),
+              const SizedBox(height: 100),
+            ],
+          ),
+          // Lotus icon
+          Positioned(
+            top: 110,
+            left: MediaQuery.of(context).size.width / 2 - 70,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                // AppBar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: const Text(
-                      'Diet Days',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    centerTitle: true,
+                ],
+                image: const DecorationImage(
+                  image: NetworkImage(
+                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
                   ),
+                  fit: BoxFit.cover,
                 ),
-                // Circular Icon and Title
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.calendar_today,
-                          size: 50,
-                          color: Color(0xFF2E7D8F),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Select a Day',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+            )
+
+          ),
+          // AppBar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppBar(
+              backgroundColor: Colors.black.withOpacity(0.7),
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: const Text(
+                "My Prescriptions",
+                style: TextStyle(
+                  color: Colors.orangeAccent,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
+              ),
+              centerTitle: true,
             ),
           ),
-          // Content
-          Expanded(
+          // Content (List of Days)
+          Positioned.fill(
+            top: 240,
             child: FutureBuilder<List<dynamic>>(
               future: _futureDays,
               builder: (context, snapshot) {
+                // Loading indicator
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Color(0xFF2E7D8F)));
+                  return const Center(child: CircularProgressIndicator());
                 }
+                // Error
                 if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        const Text('Unable to load days', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey)),
-                        const SizedBox(height: 8),
-                        Text('${snapshot.error}', style: const TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
-                      ],
-                    ),
-                  );
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 }
+                // Data loaded
                 final days = snapshot.data;
                 if (days == null || days.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.calendar_today, size: 80, color: Colors.grey),
-                        SizedBox(height: 20),
-                        Text('No Days Found', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey)),
-                        SizedBox(height: 8),
-                        Text('No days for this diet.', style: TextStyle(fontSize: 16, color: Colors.grey), textAlign: TextAlign.center),
-                      ],
+                  return const Center(
+                    child: Text(
+                      "No days found",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   );
                 }
+
+                // Display the days in a list
                 return ListView.builder(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   itemCount: days.length,
                   itemBuilder: (ctx, idx) {
+                    // The API returns objects like {"day": 1}
                     final dayNum = days[idx]['day'] ?? 'N/A';
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2E7D8F).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.calendar_today, color: Color(0xFF2E7D8F), size: 24),
-                        ),
                         title: Text(
                           "Day $dayNum",
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
                           ),
                         ),
                         onTap: () {
+                          // Go to MyMealsPage (pass day number)
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => MyMealsPage(dayNum: dayNum, dietId: widget.diet['id']),
+                              builder: (_) => MyMealsPage(dayNum:dayNum, dietId:widget.diet['id'] ,),
                             ),
                           );
                         },

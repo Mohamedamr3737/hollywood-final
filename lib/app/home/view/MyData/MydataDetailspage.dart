@@ -84,7 +84,7 @@ class _InBodyDetailPageState extends State<InBodyDetailPage> {
                 ),
                 // (B) Positioned lotus circle
                 Positioned(
-                  top: 100,
+                  top: 110,
                   left: MediaQuery.of(context).size.width / 2 - 70,
                   child: Container(
                     width: 140,
@@ -136,7 +136,7 @@ class _InBodyDetailPageState extends State<InBodyDetailPage> {
                 ),
                 // (D) Page Content
                 Positioned.fill(
-                  top: 240,
+                  top: 260,
                   child: Column(
                     children: [
                       // 1) PageView with images from myData

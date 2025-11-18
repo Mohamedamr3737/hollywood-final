@@ -3,52 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
-import 'package:get/get.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
-class RequestsController extends GetxController {
-  var isLoading = false.obs;
-  var errorMessage = ''.obs;
-  var requests = <dynamic>[].obs;
-  var categories = <dynamic>[].obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchCategories();
-  }
-
-  Future<void> fetchRequests(int typeId) async {
-    try {
-      isLoading(true);
-      errorMessage('');
-      
-      final requestsList = await fetchMyRequests(typeId);
-      requests.assignAll(requestsList);
-    } catch (e) {
-      errorMessage(e.toString());
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  Future<void> fetchCategories() async {
-    try {
-      final categoriesList = await _fetchCategories();
-      categories.assignAll(categoriesList);
-    } catch (e) {
-      errorMessage(e.toString());
-    }
-  }
-
-  // Public method that returns the categories list directly
-  Future<List<dynamic>> getCategories() async {
-    return await _fetchCategories();
-  }
-
+class RequestsController {
   // GET /api/patient/my-requests/categories
-  Future<List<dynamic>> _fetchCategories() async {
+  Future<List<dynamic>> fetchCategories() async {
     final bearerToken = await getAccessToken();
-    final url = "https://portal.ahmed-hussain.com/api/patient/my-requests/categories";
+    final url = "${ApiConfig.baseUrl}/api/patient/my-requests/categories";
 
     final response = await http.get(
       Uri.parse(url),
@@ -72,7 +33,7 @@ class RequestsController extends GetxController {
   // GET /api/patient/my-requests/list?type=<typeId>
   Future<List<dynamic>> fetchMyRequests(int typeId) async {
     final bearerToken = await getAccessToken();
-    final url = "https://portal.ahmed-hussain.com/api/patient/my-requests/list?type=$typeId";
+    final url = "${ApiConfig.baseUrl}/api/patient/my-requests/list?type=$typeId";
 
     final response = await http.get(
       Uri.parse(url),
@@ -99,7 +60,7 @@ class RequestsController extends GetxController {
     String? filePath,
   }) async {
     final bearerToken = await getAccessToken();
-    final url = "https://portal.ahmed-hussain.com/api/patient/my-requests/comment/create";
+    final url = "${ApiConfig.baseUrl}/api/patient/my-requests/comment/create";
 
     // Create a multipart request
     final request = http.MultipartRequest('POST', Uri.parse(url))
@@ -141,7 +102,7 @@ class RequestsController extends GetxController {
   // Body: { "ticket_id": <int> }
   Future<Map<String, dynamic>> closeTicket(int ticketId) async {
     final bearerToken = await getAccessToken();
-    final url = "https://portal.ahmed-hussain.com/api/patient/my-requests/close";
+    final url = "${ApiConfig.baseUrl}/api/patient/my-requests/close";
 
     final response = await http.post(
       Uri.parse(url),
@@ -174,7 +135,7 @@ class RequestsController extends GetxController {
     List<String>? filePaths, // optional
   }) async {
     final bearerToken = await getAccessToken();
-    final url = "https://portal.ahmed-hussain.com/api/patient/my-requests/create";
+    final url = "${ApiConfig.baseUrl}/api/patient/my-requests/create";
 
     // We'll use a MultipartRequest for file uploads
     final request = http.MultipartRequest('POST', Uri.parse(url))

@@ -2,11 +2,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 class MedicationController {
   Future<List<dynamic>> fetchMyPrescriptions() async {
     final bearerToken = await getAccessToken();
-    final url = "https://portal.ahmed-hussain.com/api/patient/prescription/my-prescription";
+    final url = "${ApiConfig.baseUrl}/api/patient/prescription/my-prescription";
 
     final response = await http.get(
       Uri.parse(url),

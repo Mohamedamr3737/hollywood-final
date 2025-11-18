@@ -1,450 +1,223 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../app/home/controller/about_controller.dart';
-import '../general/consts/colors.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:http/http.dart' as http;
+import 'package:s_medi/general/consts/consts.dart';
 
-class AboutPage extends StatelessWidget {
+/// A simple model for the About item.
+class AboutItem {
+  final int id;
+  final String title;
+  final String image;
+  final String shortDescription;
+  final String body;
+
+  AboutItem({
+    required this.id,
+    required this.title,
+    required this.image,
+    required this.shortDescription,
+    required this.body,
+  });
+
+  factory AboutItem.fromJson(Map<dynamic, dynamic> json) {
+    return AboutItem(
+      id: json["id"] ?? 0,
+      title: json["title"] ?? "",
+      image: json["image"] ?? "",
+      shortDescription: json["short_description"] ?? "",
+      body: json["body"] ?? "",
+    );
+  }
+}
+
+class AboutPage extends StatefulWidget {
   const AboutPage({Key? key}) : super(key: key);
 
-  Future<void> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+  @override
+  State<AboutPage> createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
+  AboutItem? aboutItem;
+  bool isLoading = false;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAboutItem();
+  }
+
+  Future<void> _fetchAboutItem() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final url = Uri.parse("${ApiConfig.baseUrl}/api/patient/pages/About");
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse["status"] == true) {
+          // If data is a single object, parse it directly
+          // If data might be a list, you can adapt as needed
+          final data = jsonResponse["data"];
+          if (data is Map) {
+            aboutItem = AboutItem.fromJson(data);
+          } else {
+            // Fallback if the API returns a list unexpectedly
+            errorMessage = "Unexpected data format.";
+          }
+        } else {
+          errorMessage = jsonResponse["message"] ?? "Failed to fetch about info.";
+        }
+      } else {
+        errorMessage = "Server error: ${response.statusCode}";
+      }
+    } catch (e) {
+      errorMessage = "An error occurred: $e";
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final AboutController controller = Get.put(AboutController());
+    // While loading, show a spinner
+    if (isLoading) {
+      return Scaffold(
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
-    return Scaffold(
-      body: Column(
-        children: [
-          // Modern Header with Background Image
-          Container(
-            height: 200,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/header_bg.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.6),
-                    Colors.black.withOpacity(0.3),
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    // App Bar
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                          Expanded(
-                            child: Text(
-                              'About Us',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          SizedBox(width: 48),
-                        ],
-                      ),
-                    ),
-                    Spacer(),
-                    // Logo
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 15,
-                            offset: Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.local_hospital,
-                        size: 40,
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          
-          // Content
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return Center(
-                  child: CircularProgressIndicator(color: AppColors.primaryColor),
-                );
-              }
-
-              if (controller.errorMessage.isNotEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Failed to load about information',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        controller.errorMessage.value,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => controller.fetchAboutData(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text('Retry'),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              final aboutData = controller.aboutData;
-              if (aboutData.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'No information available',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return SingleChildScrollView(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Welcome Section
-                    _buildSectionCard(
-                      icon: Icons.waving_hand,
-                      title: aboutData['title'] ?? 'Welcome to HealthCare+',
-                      content: 'Your trusted partner in health and wellness. We provide comprehensive healthcare services with a focus on personalized care and modern medical solutions.',
-                    ),
-                    
-                    SizedBox(height: 20),
-                    
-                    // Mission Section
-                    _buildSectionCard(
-                      icon: Icons.favorite,
-                      title: 'Our Mission',
-                      content: aboutData['mission'] ?? 'To deliver exceptional healthcare services that improve the quality of life for our patients through innovative treatments, compassionate care, and cutting-edge technology.',
-                    ),
-                    
-                    SizedBox(height: 20),
-                    
-                    // Services Section
-                    _buildSectionCard(
-                      icon: Icons.medical_services,
-                      title: 'Our Services',
-                      content: aboutData['services_description'] ?? 'We offer a wide range of medical services including consultations, diagnostics, treatments, wellness programs, and specialized care tailored to your needs.',
-                    ),
-                    
-                    SizedBox(height: 20),
-                    
-                    // Contact Section
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Icon(
-                                  Icons.contact_phone,
-                                  color: AppColors.primaryColor,
-                                  size: 20,
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              Text(
-                                'Contact Us',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16),
-                          
-                          // Contact Items
-                          _buildContactItem(
-                            icon: Icons.phone,
-                            title: 'Phone',
-                            value: aboutData['contact']?['phone'] ?? '+1 (555) 123-4567',
-                            onTap: () => _launchURL('tel:${aboutData['contact']?['phone'] ?? '+15551234567'}'),
-                          ),
-                          
-                          _buildContactItem(
-                            icon: Icons.email,
-                            title: 'Email',
-                            value: aboutData['contact']?['email'] ?? 'info@healthcareplus.com',
-                            onTap: () => _launchURL('mailto:${aboutData['contact']?['email'] ?? 'info@healthcareplus.com'}'),
-                          ),
-                          
-                          _buildContactItem(
-                            icon: Icons.location_on,
-                            title: 'Address',
-                            value: aboutData['contact']?['address'] ?? '123 Healthcare St, Medical City, MC 12345',
-                            onTap: () => _launchURL('https://maps.google.com/?q=${Uri.encodeComponent(aboutData['contact']?['address'] ?? '123 Healthcare St')}'),
-                          ),
-                          
-                          _buildContactItem(
-                            icon: Icons.language,
-                            title: 'Website',
-                            value: aboutData['contact']?['website'] ?? 'www.healthcareplus.com',
-                            onTap: () => _launchURL('https://${aboutData['contact']?['website'] ?? 'www.healthcareplus.com'}'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    SizedBox(height: 20),
-                    
-                    // Version Info
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[200]!),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            'App Version',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            '1.0.0',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionCard({
-    required IconData icon,
-    required String title,
-    required String content,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: AppColors.primaryColor,
-                  size: 20,
-                ),
-              ),
-              SizedBox(width: 12),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Text(
-            content,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContactItem({
-    required IconData icon,
-    required String title,
-    required String value,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: EdgeInsets.all(8),
-          child: Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: AppColors.primaryColor,
-                  size: 16,
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    Text(
-                      value,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Colors.grey[400],
-              ),
-            ],
+    // If there's an error or no item, show a message
+    if (aboutItem == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("About"),
+        ),
+        body: Center(
+          child: Text(
+            errorMessage.isNotEmpty ? errorMessage : "No about data found.",
+            style: const TextStyle(fontSize: 16),
           ),
         ),
+      );
+    }
+
+    // Otherwise, show the about data
+    return Scaffold(
+      // Transparent AppBar to overlay the curved header
+      appBar: AppBar(
+        title: const Text("About"),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+
+        centerTitle: true,
+      ),
+      extendBodyBehindAppBar: true, // So the app bar floats over the header
+      body: Stack(
+        children: [
+          // Curved header background
+          ClipPath(
+            clipper: _HeaderClipper(),
+            child: Container(
+              height: 300,
+              color: Colors.orangeAccent,
+            ),
+          ),
+
+          // Main content scroll view
+          SingleChildScrollView(
+            padding: const EdgeInsets.only(top: 100, left: 16, right: 16, bottom: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Hero image
+                Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      aboutItem!.image,
+                      width: double.infinity,
+                      height: 250,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Title
+                Text(
+                  aboutItem!.title,
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Short description
+                Text(
+                  aboutItem!.shortDescription,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Parse the HTML body
+                Html(
+                  data: aboutItem!.body,
+                  style: {
+                    "body": Style(
+                      fontSize: FontSize(16),
+                      color: Colors.black87,
+                    ),
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+/// A custom clipper to create a curved header shape
+class _HeaderClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    // Creates a simple curved shape for the header
+    Path path = Path();
+    path.lineTo(0, size.height - 50);
+    // Quadratic bezier curve for a smooth shape
+    path.quadraticBezierTo(
+      size.width / 2, // control point x
+      size.height,    // control point y
+      size.width,     // end point x
+      size.height - 50, // end point y
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(_HeaderClipper oldClipper) => false;
+}
+
+void main() {
+  runApp(const MaterialApp(
+    home: AboutPage(),
+    debugShowCheckedModeBanner: false,
+  ));
 }

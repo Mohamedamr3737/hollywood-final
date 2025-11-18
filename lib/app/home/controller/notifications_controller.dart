@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 class NotificationItem {
   final int id;
@@ -34,7 +35,7 @@ class NotificationsController extends GetxController {
   // Fetch notifications as before
   Future<List<NotificationItem>> fetchNotifications() async {
     final String? bearerToken = await getAccessToken();
-    const String url = 'https://portal.ahmed-hussain.com/api/patient/notifications/list';
+    final String url = '${ApiConfig.baseUrl}/api/patient/notifications/list';
 
     final response = await http.get(
       Uri.parse(url),
@@ -76,7 +77,7 @@ class NotificationsController extends GetxController {
     print(notificationId);
     final String? bearerToken = await getAccessToken();
     final String url =
-        'https://portal.ahmed-hussain.com/api/patient/notifications/read?notification_id=$notificationId';
+        '${ApiConfig.baseUrl}/api/patient/notifications/read?notification_id=$notificationId';
 
     final response = await http.post(
       Uri.parse(url),
@@ -107,7 +108,7 @@ class NotificationsController extends GetxController {
   Future<int> fetchUnreadCount() async {
     print("function called");
     final String? bearerToken = await getAccessToken();
-    const String url = 'https://portal.ahmed-hussain.com/api/patient/notifications/unread-count';
+    final String url = '${ApiConfig.baseUrl}/api/patient/notifications/unread-count';
 
     final response = await http.get(
       Uri.parse(url),
@@ -135,7 +136,7 @@ class NotificationsController extends GetxController {
   // Clear all notifications via the API
   Future<void> clearNotifications() async {
     final String? bearerToken = await getAccessToken();
-    const String url = 'https://portal.ahmed-hussain.com/api/patient/notifications/clear';
+    final String url = '${ApiConfig.baseUrl}/api/patient/notifications/clear';
 
     final response = await http.post(
       Uri.parse(url),

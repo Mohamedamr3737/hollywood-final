@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 class ShopController extends GetxController {
   var isLoading = false.obs;
@@ -41,7 +42,7 @@ class ShopController extends GetxController {
       }
 
       final query = Uri(queryParameters: params).query;
-      final url = "https://portal.ahmed-hussain.com/api/patient/shop/products?$query";
+      final url = "${ApiConfig.baseUrl}/api/patient/shop/products?$query";
 
       final response = await http.get(
         Uri.parse(url),
@@ -97,7 +98,6 @@ class ShopController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = "Something went wrong!";
-      print("Exception in fetchProducts: $e");
     } finally {
       isLoading(false);
     }
@@ -108,7 +108,7 @@ class ShopController extends GetxController {
   Future<void> fetchCategories() async {
     try {
       final bearerToken = await getAccessToken();
-      final url = "https://portal.ahmed-hussain.com/api/patient/shop/categories";
+      final url = "${ApiConfig.baseUrl}/api/patient/shop/categories";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -130,7 +130,6 @@ class ShopController extends GetxController {
         }
       }
     } catch (e) {
-      print("Exception in fetchCategories: $e");
     }
   }
 
@@ -161,7 +160,7 @@ class ShopController extends GetxController {
       final body = json.encode({"products": productList});
 
       // 4) POST request
-      final url = "https://portal.ahmed-hussain.com/api/patient/shop/store";
+      final url = "${ApiConfig.baseUrl}/api/patient/shop/store";
       final response = await http.post(
         Uri.parse(url),
         headers: {

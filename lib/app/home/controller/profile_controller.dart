@@ -1,27 +1,25 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import '../../auth/controller/token_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../auth/view/login_page.dart';
+import 'package:s_medi/general/consts/consts.dart';
+import 'package:s_medi/general/services/alert_service.dart';
+class ProfileController with ChangeNotifier {
+  String apiUrl = "${ApiConfig.baseUrl}/api/patient/profile/me";
+  String updateApiUrl = "${ApiConfig.baseUrl}/api/patient/profile/update";
+  String logoutApiUrl = "${ApiConfig.baseUrl}/api/patient/auth/logout";
+  String deleteApiUrl = "${ApiConfig.baseUrl}/api/patient/auth/delete";
 
-class ProfileController extends GetxController {
-  String apiUrl = "https://portal.ahmed-hussain.com/api/patient/profile/me";
-  String updateApiUrl = "https://portal.ahmed-hussain.com/api/patient/profile/update";
-  String logoutApiUrl = "https://portal.ahmed-hussain.com/api/patient/auth/logout";
-  String deleteApiUrl = "https://portal.ahmed-hussain.com/api/patient/auth/delete";
-
-  var userData = <String, dynamic>{}.obs;
-  var isLoading = true.obs;
-  var errorMessage = ''.obs;
-
-  // Getter for profile that the UI expects
-  Map<String, dynamic>? get profile => userData.isNotEmpty ? userData : null;
+  Map<String, dynamic>? userData;
+  bool isLoading = true;
+  String errorMessage = '';
 
   Future<void> fetchProfile() async {
     try {
-      isLoading(true);
       String? token = await getAccessToken();
 
       final response = await http.get(
@@ -34,88 +32,110 @@ class ProfileController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        userData.assignAll(data['data']);
-        errorMessage('');
+        userData = data['data'];
+        errorMessage = '';
       } else {
-        errorMessage("Failed to fetch profile. Try again later.");
+        errorMessage = "Failed to fetch profile. Try again later.";
       }
     } catch (e) {
-      errorMessage("An error occurred: $e");
+      errorMessage = "An error occurred: $e";
     }
-    isLoading(false);
+    isLoading = false;
+    notifyListeners();
   }
 
-  Future<void> updateProfile(Map<String, dynamic> updatedData, BuildContext context) async {
+  Future<void> updateProfile(Map<String, dynamic> updatedData, BuildContext context, {File? imageFile}) async {
     try {
       String? token = await getAccessToken();
 
-      // Ensure passwords are included only if they are provided
-      Map<String, dynamic> finalData = {
-        "name": updatedData["name"],
-        "gender": updatedData["gender"],
-        "birthday": updatedData["birthday"],
-        "email": updatedData["email"],
-        "address": updatedData["address"],
-      };
-
-      if (updatedData.containsKey("password") && updatedData["password"].isNotEmpty) {
-        finalData["password"] = updatedData["password"];
-        finalData["password_confirmation"] = updatedData["password_confirmation"];
-      }
-
-      final response = await http.post(
-        Uri.parse(updateApiUrl),
-        headers: {
+      // Check if we have an image file to upload
+      if (imageFile != null) {
+        // Use multipart/form-data for image upload
+        var request = http.MultipartRequest('POST', Uri.parse(updateApiUrl));
+        request.headers.addAll({
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(finalData),
-      );
+        });
 
-      final responseData = json.decode(response.body);
+        // Add text fields
+        request.fields['name'] = updatedData["name"];
+        request.fields['gender'] = updatedData["gender"];
+        request.fields['birthday'] = updatedData["birthday"];
+        request.fields['email'] = updatedData["email"];
+        request.fields['address'] = updatedData["address"];
+        request.fields['phone'] = updatedData["phone"];
 
-      if (response.statusCode == 200 && responseData["status"] == true) {
-        fetchProfile(); // Refresh profile data
-        errorMessage('');
-
-        // Show success message
-        Get.snackbar(
-          "Success",
-          "Profile updated successfully",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      } else {
-        // Handle API error response
-        if (responseData["message"] is Map) {
-          errorMessage(responseData["message"].values.join("\n")); // Combine all error messages
-        } else {
-          errorMessage(responseData["message"] ?? "Failed to update profile.");
+        // Add password fields if provided
+        if (updatedData.containsKey("password") && updatedData["password"].isNotEmpty) {
+          request.fields['password'] = updatedData["password"];
+          request.fields['password_confirmation'] = updatedData["password_confirmation"];
         }
 
-        // Show error message in Snackbar
-        Get.snackbar(
-          "Error",
-          errorMessage.value,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+        // Add image file
+        request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
+        var responseData = json.decode(response.body);
+
+        if (response.statusCode == 200 && responseData["status"] == true) {
+          fetchProfile(); // Refresh profile data
+          errorMessage = '';
+          AlertService.success(context, "Profile updated successfully");
+        } else {
+          if (responseData["message"] is Map) {
+            errorMessage = responseData["message"].values.join("\n");
+          } else {
+            errorMessage = responseData["message"] ?? "Failed to update profile.";
+          }
+          AlertService.error(context, errorMessage);
+        }
+      } else {
+        // No image file, use regular JSON request
+        Map<String, dynamic> finalData = {
+          "name": updatedData["name"],
+          "gender": updatedData["gender"],
+          "birthday": updatedData["birthday"],
+          "email": updatedData["email"],
+          "address": updatedData["address"],
+          "phone": updatedData["phone"],
+        };
+
+        if (updatedData.containsKey("password") && updatedData["password"].isNotEmpty) {
+          finalData["password"] = updatedData["password"];
+          finalData["password_confirmation"] = updatedData["password_confirmation"];
+        }
+
+        final response = await http.post(
+          Uri.parse(updateApiUrl),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(finalData),
         );
+
+        final responseData = json.decode(response.body);
+
+        if (response.statusCode == 200 && responseData["status"] == true) {
+          fetchProfile(); // Refresh profile data
+          errorMessage = '';
+          AlertService.success(context, "Profile updated successfully");
+        } else {
+          if (responseData["message"] is Map) {
+            errorMessage = responseData["message"].values.join("\n");
+          } else {
+            errorMessage = responseData["message"] ?? "Failed to update profile.";
+          }
+          AlertService.error(context, errorMessage);
+        }
       }
     } catch (e) {
-      print(e);
-      errorMessage("An error occurred: $e");
-
-      Get.snackbar(
-        "Error",
-        errorMessage.value,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      errorMessage = "An error occurred: $e";
+      AlertService.error(context, errorMessage);
     }
+    notifyListeners();
   }
 
   /// New function to sign out the user.
@@ -124,13 +144,7 @@ class ProfileController extends GetxController {
       // Get the current access token.
       String? token = await getAccessToken();
       if (token == null) {
-        Get.snackbar(
-          "Error",
-          "No token found. Already signed out?",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        AlertService.error(context, "No token found. Already signed out?");
         return;
       }
 
@@ -148,35 +162,18 @@ class ProfileController extends GetxController {
         await prefs.remove("access_token");
 
         // Optionally, you can also clear user data.
-        userData.clear();
+        userData = null;
+        notifyListeners();
 
-        Get.snackbar(
-          "Success",
-          "Signed out successfully",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        AlertService.success(context, "Signed out successfully");
 
         Get.offAll(() => const LoginView());
 
       } else {
-        Get.snackbar(
-          "Error",
-          "Sign out failed: ${response.statusCode}",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        AlertService.error(context, "Sign out failed: ${response.statusCode}");
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "An error occurred: $e",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      AlertService.error(context, "An error occurred: $e");
     }
   }
 
@@ -186,13 +183,7 @@ class ProfileController extends GetxController {
       // Retrieve the current access token.
       String? token = await getAccessToken();
       if (token == null) {
-        Get.snackbar(
-          "Error",
-          "No token found. You may already be signed out.",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        AlertService.error(context, "No token found. You may already be signed out.");
         return;
       }
 
@@ -211,35 +202,18 @@ class ProfileController extends GetxController {
         await prefs.remove("access_token");
 
         // Optionally, clear user data.
-        userData.clear();
+        userData = null;
+        notifyListeners();
 
-        Get.snackbar(
-          "Success",
-          "Account deleted successfully",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        AlertService.success(context, "Account deleted successfully");
         // Navigate to login page.
         Get.offAll(() => LoginView());
       } else {
         String errorMsg = jsonResponse["message"] ?? "Failed to delete account.";
-        Get.snackbar(
-          "Error",
-          errorMsg,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        AlertService.error(context, errorMsg);
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "An error occurred: $e",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      AlertService.error(context, "An error occurred: $e");
     }
   }
 

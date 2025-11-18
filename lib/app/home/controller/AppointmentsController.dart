@@ -3,10 +3,11 @@ import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
 import 'package:get/get.dart';
 import '../../../general/consts/consts.dart';
+import '../../../general/services/alert_service.dart';
 
 class AppointmentsController extends GetxController {
   final String apiUrl =
-      "https://portal.ahmed-hussain.com/api/patient/appointments";
+      "${ApiConfig.baseUrl}/api/patient/appointments";
 
   var isLoading = false.obs;
   var errorMessage = ''.obs;
@@ -49,7 +50,7 @@ class AppointmentsController extends GetxController {
       final formattedDate = date.replaceAll('-', '/');
       var bearerToken = await getAccessToken();
       final url =
-          "https://portal.ahmed-hussain.com/api/patient/appointments/setting?date=$formattedDate";
+          "${ApiConfig.baseUrl}/api/patient/appointments/setting?date=$formattedDate";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -93,7 +94,7 @@ class AppointmentsController extends GetxController {
       var bearerToken = await getAccessToken();
       final formattedDate = date.replaceAll('-', '/');
       final url =
-          "https://portal.ahmed-hussain.com/api/patient/appointments/store";
+          "${ApiConfig.baseUrl}/api/patient/appointments/store";
       final body = json.encode({
         "date": formattedDate,
         "time": time,
@@ -110,16 +111,27 @@ class AppointmentsController extends GetxController {
         },
         body: body,
       );
+
+      print("helloooo");
+      print("Response body: ${response.body}");
+
       final jsonData = json.decode(response.body);
+
       if (response.statusCode == 200 && jsonData["status"] == true) {
         return true;
       } else {
-        errorMessage.value =
-            jsonData["message"] ?? "Failed to store appointment";
+        if (jsonData["message"] is Map) {
+          var firstKey = (jsonData["message"] as Map).keys.first;
+          var errors = jsonData["message"][firstKey];
+          errorMessage.value =
+          errors is List && errors.isNotEmpty ? errors[0] : "Failed to store appointment";
+        } else {
+          errorMessage.value = jsonData["message"] ?? "Failed to store appointment";
+        }
         return false;
       }
     } catch (e) {
-      errorMessage.value = "Something went wrong!";
+      errorMessage.value = e.toString();
       print("Exception in storeAppointment: $e");
       return false;
     } finally {
@@ -127,13 +139,14 @@ class AppointmentsController extends GetxController {
     }
   }
 
+
   /// Cancel an appointment using the API.
   /// Sends the appointment ID in the request body.
   Future<bool> cancelAppointment({required int id}) async {
     try {
       isLoading(true);
       final bearerToken = await getAccessToken();
-      final url = "https://portal.ahmed-hussain.com/api/patient/appointments/cancel";
+      final url = "${ApiConfig.baseUrl}/api/patient/appointments/cancel";
       final body = json.encode({"id": id});
       final response = await http.post(
         Uri.parse(url),
@@ -175,9 +188,7 @@ class AppointmentsController extends GetxController {
       });
     } else {
       // Show an error message or do nothing.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage.value)),
-      );
+      AlertService.error(context, errorMessage.value);
     }
   }
 }

@@ -1,26 +1,13 @@
-import '/general/consts/consts.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 class LoadingIndicator extends StatelessWidget {
-  final Color? color;
-  final double size;
-  
-  const LoadingIndicator({
-    super.key,
-    this.color,
-    this.size = 24,
-  });
+  const LoadingIndicator({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: size,
-        height: size,
+    return const Center(
         child: CircularProgressIndicator(
-          color: color ?? AppColors.primaryColor,
-          strokeWidth: 2,
-        ),
-      ),
-    );
+      color: Colors.white,
+    ));
   }
 }

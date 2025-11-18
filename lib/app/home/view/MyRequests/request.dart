@@ -1,495 +1,384 @@
+// requests_flow.dart
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import '../../controller/requests_controller.dart'; // <-- Import your controller
-import '../../../auth/controller/token_controller.dart';
-import 'SelectCategoryRequestPage.dart';
+import 'AddTicketPageRequest.dart';
 import 'TicketDetailsPageRequest.dart';
-import '../../../../general/consts/colors.dart';
 
 class MyRequestsPage extends StatefulWidget {
-  final int? categoryId; // nullable for flexibility
-  const MyRequestsPage({Key? key, this.categoryId}) : super(key: key);
+  final int category; // e.g. "Ask Doctor", "Sessions", etc.
+
+  const MyRequestsPage({Key? key, required this.category}) : super(key: key);
 
   @override
   State<MyRequestsPage> createState() => _MyRequestsPageState();
 }
 
-class _MyRequestsPageState extends State<MyRequestsPage> {
-  final RequestsController controller = Get.put(RequestsController());
+class _MyRequestsPageState extends State<MyRequestsPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
-  void checkLoginStatus() {
-    final token = getAccessToken();
-    if (token == null) {
-      Navigator.pop(context);
-    }
-  }
+  // We'll store each request as a Map<String, dynamic>
+  final List<Map<String, dynamic>> openRequests = [];
+  final List<Map<String, dynamic>> resolvedRequests = [];
+  final List<Map<String, dynamic>> closedRequests = [];
+  final List<Map<String, dynamic>> closedByCustomerRequests = [];
 
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  final _requestsController = RequestsController();
 
   @override
   void initState() {
     super.initState();
-    checkLoginStatus();
+    _tabController = TabController(length: 4, vsync: this);
+    _fetchRequests();
+  }
 
-    if (widget.categoryId != null) {
-      controller.fetchRequests(widget.categoryId!);
-    } else if (controller.categories.isNotEmpty) {
-      controller.fetchRequests(controller.categories.first['id']);
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+
+  // Fetch requests from the API and distribute them by status
+  Future<void> _fetchRequests() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final requestsList = await _requestsController.fetchMyRequests(widget.category);
+
+      // Temporary lists to categorize by status
+      final List<Map<String, dynamic>> open = [];
+      final List<Map<String, dynamic>> resolved = [];
+      final List<Map<String, dynamic>> closed = [];
+      final List<Map<String, dynamic>> closedByCustomer = [];
+
+      for (final r in requestsList) {
+        final status = r['status'] ?? '';
+
+        // Sort each request into the right list
+        if (status == 'open') {
+          open.add(r);
+        } else if (status == 'Resolved') {
+          resolved.add(r);
+        } else if (status == 'Closed') {
+          closed.add(r);
+        } else if (status == 'Closed by customer') {
+          closedByCustomer.add(r);
+        }
+      }
+
+      // Update our lists
+      setState(() {
+        openRequests
+          ..clear()
+          ..addAll(open);
+        resolvedRequests
+          ..clear()
+          ..addAll(resolved);
+        closedRequests
+          ..clear()
+          ..addAll(closed);
+        closedByCustomerRequests
+          ..clear()
+          ..addAll(closedByCustomer);
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
+
+  // "Add new ticket" button
+  void _goToAddTicket() async {
+    // In your code, AddTicketPage returns a "Ticket",
+    // but you can change it to return a Map<String, dynamic> if you prefer
+    final newRequest = await Navigator.of(context).push<Map<String, dynamic>>(
+      MaterialPageRoute(
+        builder: (_) => AddTicketPage(category: widget.category),
+      ),
+    );
+    if (newRequest != null) {
+      // Typically new requests are "open"
+      setState(() {
+        openRequests.add(newRequest);
+      });
+    }
+  }
+
+  // Tapping on a request -> see details
+  // If the user updates the request status, reflect in our lists
+  void _goToRequestDetails(Map<String, dynamic> request) async {
+    // // In your code, TicketDetailsPage expects a "Ticket" class,
+    // // but you can change it to accept a Map<String, dynamic> instead
+    final updatedRequest = await Navigator.of(context).push<Map<String, dynamic>>(
+      MaterialPageRoute(
+        builder: (_) => TicketDetailsPage(request: request),
+      ),
+    );
+    if (updatedRequest != null) {
+      // Remove it from all lists first
+      openRequests.removeWhere((r) => r['id'].toString() == updatedRequest['id'].toString());
+      resolvedRequests.removeWhere((r) => r['id'].toString() == updatedRequest['id'].toString());
+      closedRequests.removeWhere((r) => r['id'].toString() == updatedRequest['id'].toString());
+      closedByCustomerRequests.removeWhere((r) => r['id'].toString() == updatedRequest['id'].toString());
+
+      // Re-insert based on updated status
+      final newStatus = updatedRequest['status'] ?? '';
+      if (newStatus == 'open') {
+        openRequests.add(updatedRequest);
+      } else if (newStatus == 'Resolved') {
+        resolvedRequests.add(updatedRequest);
+      } else if (newStatus == 'Closed') {
+        closedRequests.add(updatedRequest);
+      } else if (newStatus == 'Closed by customer') {
+        closedByCustomerRequests.add(updatedRequest);
+      }
+
+      setState(() {});
+    }
+  }
+
+  // Build a single request card
+  Widget _buildRequestCard(Map<String, dynamic> request) {
+    // Extract the fields
+    final subject = request['subject'] ?? '';
+    final description = request['description'] ?? '';
+    final createdAt = request['created_at'] ?? '';
+
+    // We'll store the first file link in "filePath"
+    final files = request['files'] as List<dynamic>? ?? [];
+    String? filePath;
+    if (files.isNotEmpty) {
+      filePath = files[0]['link']?.toString();
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.orange[300],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _goToRequestDetails(request),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title label
+            const Text(
+              "Title",
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+            // Subject
+            Text(
+              subject,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            // Details label
+            const Text(
+              "Details",
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+            // Description
+            Text(
+              description,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            // File path (if any)
+            if (filePath != null && filePath.isNotEmpty) ...[
+              Row(
+                children: [
+                  const Icon(Icons.insert_drive_file, size: 18),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      filePath,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+            ],
+            // Date label
+            const Text(
+              "Date",
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+            Text(
+              createdAt,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Build a list of requests for each tab
+  Widget _buildRequestsList(List<Map<String, dynamic>> requests) {
+    if (requests.isEmpty) {
+      return const Center(
+        child: Text(
+          "Empty Tickets!",
+          style: TextStyle(fontSize: 18, color: Colors.black54),
+        ),
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: requests.length,
+      itemBuilder: (context, index) {
+        final req = requests[index];
+        return _buildRequestCard(req);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Column(
+    // Decide what to show: spinner, error, or normal tabbed UI
+    Widget content;
+    if (_isLoading) {
+      content = const Center(child: CircularProgressIndicator());
+    } else if (_errorMessage != null) {
+      content = Center(
+        child: Text(
+          "Error: $_errorMessage",
+          style: const TextStyle(color: Colors.red, fontSize: 16),
+        ),
+      );
+    } else {
+      content = Column(
         children: [
-          // Header Section
           Container(
-            height: 280,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
-            ),
-            child: Stack(
-              children: [
-                // Background image with overlay
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                      image: DecorationImage(
-                        image: const NetworkImage(
-                          'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
-                        ),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.withOpacity(0.8),
-                          BlendMode.overlay,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                // AppBar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: const Text(
-                      'My Requests',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    centerTitle: true,
-                  ),
-                ),
-                // Circular Icon and Title
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.support_agent_outlined,
-                          size: 50,
-                          color: Color(0xFF2E7D8F),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Support Tickets',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+            color: const Color(0xFF000610),
+            child: TabBar(
+              controller: _tabController,
+              indicatorColor: Colors.orangeAccent,
+              labelColor: Colors.orangeAccent,
+              unselectedLabelColor: Colors.white70,
+              isScrollable: true,
+              tabs: const [
+                Tab(text: "open"),
+                Tab(text: "Resolved"),
+                Tab(text: "Closed"),
+                Tab(text: "Closed by customer"),
               ],
             ),
           ),
-          // Content
           Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xFF2E7D8F),
-                  ),
-                );
-              }
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildRequestsList(openRequests),
+                _buildRequestsList(resolvedRequests),
+                _buildRequestsList(closedRequests),
+                _buildRequestsList(closedByCustomerRequests),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
 
-              if (controller.errorMessage.isNotEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Unable to load requests',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        controller.errorMessage.value,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (controller.categories.isNotEmpty) {
-                            controller.fetchRequests(controller.categories.first['id']);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2E7D8F),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return Column(
-                children: [
-                  // Requests List
-                  Expanded(
-                    child: controller.requests.isEmpty
-                        ? _buildEmptyState()
-                        : ListView.builder(
-                            padding: const EdgeInsets.all(20),
-                            itemCount: controller.requests.length,
-                            itemBuilder: (context, index) {
-                              final request = controller.requests[index];
-                              return _buildRequestCard(request);
-                            },
-                          ),
-                  ),
-                  
-                  // Add New Request Button
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SelectCategoryPage(),
-                            ),
-                          ).then((_) {
-                            // Refresh requests when returning
-                            if (controller.categories.isNotEmpty) {
-                              controller.fetchRequests(controller.categories.first['id']);
-                            }
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2E7D8F),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 2,
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add),
-                            SizedBox(width: 8),
-                            Text(
-                              'New Request',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          // (1) Sparkly background
+          Column(
+            children: [
+              SizedBox(
+                height: 150,
+                width: double.infinity,
+                child: Image.network(
+                  'https://t3.ftcdn.net/jpg/03/66/08/34/360_F_366083470_jTuk7ZhaXxlk3paaPIxxPv2jUQhe1tQb.jpg',                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 100),
+            ],
+          ),
+          // (2) Lotus icon
+          Positioned(
+            top: 110,
+            left: MediaQuery.of(context).size.width / 2 - 70,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ],
-              );
-            }),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.inbox_outlined,
-            size: 80,
-            color: Colors.grey[300],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'No Requests Yet',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Create your first support request to get help',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[500],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRequestCard(Map<String, dynamic> request) {
-    final title = request['title'] ?? 'Support Request';
-    final status = request['status'] ?? 'pending';
-    final createdAt = request['created_at'] ?? '';
-    final category = request['category']?['name'] ?? 'General';
-    final id = request['id']?.toString() ?? '';
-
-    Color statusColor;
-    IconData statusIcon;
-    
-    switch (status.toLowerCase()) {
-      case 'open':
-      case 'pending':
-        statusColor = const Color(0xFFFF6B35);
-        statusIcon = Icons.schedule;
-        break;
-      case 'in_progress':
-        statusColor = Colors.blue;
-        statusIcon = Icons.hourglass_empty;
-        break;
-      case 'resolved':
-      case 'closed':
-        statusColor = Colors.green;
-        statusIcon = Icons.check_circle;
-        break;
-      default:
-        statusColor = Colors.grey;
-        statusIcon = Icons.help_outline;
-    }
-
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TicketDetailsPage(
-              request: request,
-            ),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Row
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                image: const DecorationImage(
+                  image: NetworkImage(
+                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
                   ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2E7D8F).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '#$id',
-                    style: const TextStyle(
-                      color: Color(0xFF2E7D8F),
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  fit: BoxFit.cover,
                 ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        statusIcon,
-                        size: 12,
-                        color: statusColor,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        status.toUpperCase(),
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 12),
-            
-            // Title
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
               ),
+            )
+
+          ),
+          // (3) AppBar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppBar(
+              backgroundColor: Colors.black.withOpacity(0.7),
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: const Text(
+                "My Requests",
+                style: TextStyle(
+                  color: Colors.orangeAccent,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
             ),
-            
-            const SizedBox(height: 8),
-            
-            // Category and Date
-            Row(
-              children: [
-                Icon(
-                  Icons.category_outlined,
-                  size: 16,
-                  color: Colors.grey[600],
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  category,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const Spacer(),
-                Icon(
-                  Icons.schedule,
-                  size: 16,
-                  color: Colors.grey[600],
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  _formatDate(createdAt),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
+          // (4) Main content (tabs, spinner, or error)
+          Positioned.fill(
+            top: 250,
+            child: content,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.black,
+        onPressed: _goToAddTicket,
+        label: const Text(
+          "Add new ticket",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
-  }
-
-  String _formatDate(String dateString) {
-    try {
-      final date = DateTime.parse(dateString);
-      final now = DateTime.now();
-      final difference = now.difference(date);
-      
-      if (difference.inDays > 0) {
-        return '${difference.inDays}d ago';
-      } else if (difference.inHours > 0) {
-        return '${difference.inHours}h ago';
-      } else if (difference.inMinutes > 0) {
-        return '${difference.inMinutes}m ago';
-      } else {
-        return 'Just now';
-      }
-    } catch (e) {
-      return dateString;
-    }
   }
 }

@@ -30,59 +30,15 @@ Widget buildPurchaseTab() {
   return Obx(() {
     // If the controller is currently loading data
     if (balanceController.isLoading.value) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF2E7D8F),
-        ),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     // If there's an error
     if (balanceController.errorMessage.isNotEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Unable to load purchases',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              balanceController.errorMessage.value,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => balanceController.fetchPurchases(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E7D8F),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text('Retry'),
-            ),
-          ],
+        child: Text(
+          balanceController.errorMessage.value,
+          style: const TextStyle(color: Colors.red, fontSize: 16),
         ),
       );
     }
@@ -91,41 +47,17 @@ Widget buildPurchaseTab() {
     final purchaseItems = balanceController.purchases;
     if (purchaseItems.isEmpty) {
       // No data, no error
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.shopping_cart_outlined,
-              size: 80,
-              color: Colors.grey[300],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'No Purchases Found',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Your purchase history will appear here',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[500],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+      return const Center(
+        child: Text(
+          "No Purchases Found",
+          style: TextStyle(fontSize: 16),
         ),
       );
     }
 
     // Build the ListView of purchases
     return ListView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       itemCount: purchaseItems.length,
       itemBuilder: (context, index) {
         final item = purchaseItems[index];
@@ -150,79 +82,57 @@ Widget buildPurchaseTab() {
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: Colors.orange[300],
+            borderRadius: BorderRadius.circular(12),
           ),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with type and price
+              // e.g. "Session" or "Appointment"
+              Text(
+                itemType,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+
+              // Title + Price + optional discount
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2E7D8F).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      _getTypeIcon(itemType),
-                      color: const Color(0xFF2E7D8F),
-                      size: 20,
+                  // Title
+                  Text(
+                    itemTitle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          itemType,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          itemTitle,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black87,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  // Price + discount if discount > 0
+                  Row(
                     children: [
                       Text(
                         "${price.toStringAsFixed(2)} EGP",
                         style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF2E7D8F),
+                          fontSize: 15,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       if (discount > 0) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(width: 8),
                         Text(
+                          // Original price might be price + discount, or item["price"] if net was calculated
+                          // Let's assume "price + discount" is the original
                           "${(price + discount).toStringAsFixed(2)} EGP",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black54,
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),
@@ -232,83 +142,20 @@ Widget buildPurchaseTab() {
                 ],
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
-              // Details row
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Net Amount',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          "${net.toStringAsFixed(2)} EGP",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black87,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (branch.isNotEmpty) ...[
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Branch',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            branch,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
+              // Net + Branch + Date
+              Text(
+                "Net: ${net.toStringAsFixed(2)} EGP",
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
               ),
-
-              const SizedBox(height: 12),
-
-              // Date
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today_outlined,
-                    size: 16,
-                    color: Colors.grey[500],
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    createdAt,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+              Text(
+                branch,
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+              ),
+              Text(
+                createdAt,
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
               ),
             ],
           ),
@@ -316,19 +163,4 @@ Widget buildPurchaseTab() {
       },
     );
   });
-}
-
-IconData _getTypeIcon(String type) {
-  switch (type.toLowerCase()) {
-    case 'session':
-      return Icons.medical_services_outlined;
-    case 'appointment':
-      return Icons.calendar_today_outlined;
-    case 'treatment':
-      return Icons.healing_outlined;
-    case 'consultation':
-      return Icons.person_outline;
-    default:
-      return Icons.shopping_cart_outlined;
-  }
 }

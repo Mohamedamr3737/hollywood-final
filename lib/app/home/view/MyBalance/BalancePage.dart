@@ -5,11 +5,12 @@ import 'summarytabbalance.dart';
 import 'PurshaseTabBalance.dart';
 import 'paymentstabbalance.dart';
 import '../../../auth/controller/token_controller.dart';
-import '../../../../general/consts/colors.dart';
+import 'package:s_medi/general/services/alert_service.dart';
 
 class MyBalancePage extends StatefulWidget {
   @override
   State<MyBalancePage> createState() => _MyBalancePageState();
+
 }
 
 class _MyBalancePageState extends State<MyBalancePage>
@@ -22,7 +23,9 @@ class _MyBalancePageState extends State<MyBalancePage>
   @override
   void initState() {
     checkLoginStatus();
+
     super.initState();
+
     _tabController = TabController(length: 3, vsync: this);
 
     // Fetch the purchases once the page initializes
@@ -37,202 +40,116 @@ class _MyBalancePageState extends State<MyBalancePage>
     super.dispose();
   }
 
+  // --------------------------------
+  // BUILD
+  // --------------------------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
       body: Column(
         children: [
-          // Header Section
-          Container(
-            height: 280,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
+          // -- (1) Background + Custom AppBar
+          Stack(
+            children: [
+              // Background image at the top
+              Container(
+                height: 150,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
-            child: Stack(
-              children: [
-                // Background image with overlay
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                      image: DecorationImage(
-                        image: const NetworkImage(
-                          'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
-                        ),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.withOpacity(0.8),
-                          BlendMode.overlay,
-                        ),
-                      ),
+              // Custom AppBar on top
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: AppBar(
+                  backgroundColor: Colors.black.withOpacity(0.7),
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  title: const Text(
+                    "My Balance",
+                    style: TextStyle(
+                      color: Colors.orangeAccent,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  centerTitle: true,
                 ),
-                // AppBar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: const Text(
-                      'My Balance',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    centerTitle: true,
-                  ),
-                ),
-                // Circular Icon and Title
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.account_balance_wallet_outlined,
-                          size: 50,
-                          color: Color(0xFF2E7D8F),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Financial Overview',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
 
-          // Tab Bar with modern design
+          // -- (2) Tab Bar (dark background)
           Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
+            color: const Color(0xFF000610), // A dark color for contrast
             child: TabBar(
               controller: _tabController,
-              indicator: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: const Color(0xFF2E7D8F),
-                    width: 3,
-                  ),
-                ),
+              indicator: const UnderlineTabIndicator(
+                borderSide: BorderSide(color: Colors.orangeAccent, width: 2),
               ),
-              labelColor: const Color(0xFF2E7D8F),
-              unselectedLabelColor: Colors.grey[600],
+              labelColor: Colors.orangeAccent,
+              unselectedLabelColor: Colors.white70,
               labelStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
+                fontSize: 18,
               ),
               tabs: const [
                 Tab(text: "Summary"),
-                Tab(text: "Purchases"),
+                Tab(text: "Purchase"),
                 Tab(text: "Payments"),
               ],
             ),
           ),
 
-          // TabBarView
+          // -- (3) TabBarView
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
                 // Summary tab
                 buildSummaryTab(),
+
                 // Purchase tab
                 buildPurchaseTab(),
+
                 // Payments tab
                 buildPaymentsTab(),
               ],
             ),
           ),
 
-          // Pay Button with modern design
+          // -- (4) Pay Button pinned at the bottom
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E7D8F),
-                foregroundColor: Colors.white,
+                backgroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                elevation: 0,
               ),
               onPressed: () {
                 // Handle Pay Button logic
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Pay button clicked!"),
-                    backgroundColor: Color(0xFF2E7D8F),
-                  ),
-                );
+                AlertService.info(context, "Pay button clicked!");
               },
               child: const Text(
                 "Pay",
                 style: TextStyle(
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),

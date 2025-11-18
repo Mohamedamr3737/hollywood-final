@@ -72,63 +72,15 @@ Widget buildSummaryTab() {
   return Obx(() {
     // 1) If loading, show spinner
     if (balanceController.isLoading.value) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF2E7D8F),
-        ),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     // 2) If there's an error
     if (balanceController.errorMessage.isNotEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Unable to load balance',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              balanceController.errorMessage.value,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                balanceController.fetchSummary();
-                balanceController.fetchPurchases();
-                balanceController.fetchPayments();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E7D8F),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text('Retry'),
-            ),
-          ],
+        child: Text(
+          balanceController.errorMessage.value,
+          style: const TextStyle(color: Colors.red, fontSize: 16),
         ),
       );
     }
@@ -144,69 +96,33 @@ Widget buildSummaryTab() {
     final totalAfterDiscount = balanceController.totalAfterDiscount.value;
 
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Current Balance Card
+          // A) Current Balance Container
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                const Text(
+                  "Current Balance",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                // Circle + number
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2E7D8F).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.account_balance_wallet_outlined,
-                        color: Color(0xFF2E7D8F),
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Current Balance',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              _PulsingCircle(isNonZero: totalPaid != 0),
-                              const SizedBox(width: 8),
-                              Text(
-                                "${totalPaid.toStringAsFixed(2)} EGP",
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2E7D8F),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                    _PulsingCircle(isNonZero: totalPaid != 0),
+                    const SizedBox(width: 8),
+                    Text(
+                      "${totalPaid.toStringAsFixed(2)} EGP",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -215,24 +131,24 @@ Widget buildSummaryTab() {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // Summary Grid
+          // B) GridView with summary items
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 1.3,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1.2,
               children: [
-                buildSummaryCard("Total Cost", "${totalCost.toStringAsFixed(2)} EGP", Icons.receipt_long_outlined),
-                buildSummaryCard("Total Discount", "${totalDiscount.toStringAsFixed(2)} EGP", Icons.discount_outlined),
-                buildSummaryCard("After Discount", "${totalAfterDiscount.toStringAsFixed(2)} EGP", Icons.calculate_outlined),
-                buildSummaryCard("Total Paid", "${totalPaid.toStringAsFixed(2)} EGP", Icons.payment_outlined),
-                buildSummaryCard("Total UnPaid", "${totalUnPaid.toStringAsFixed(2)} EGP", Icons.money_off_outlined),
-                buildSummaryCard("Total Use", "${totalUse.toStringAsFixed(2)} EGP", Icons.check_circle_outline),
-                buildSummaryCard("Total UnUsed", "${totalUnused.toStringAsFixed(2)} EGP", Icons.pending_outlined),
-                buildSummaryCard("Refund", "${totalRefund.toStringAsFixed(2)} EGP", Icons.refresh_outlined),
+                buildSummaryCard("Total Cost", "${totalCost.toStringAsFixed(2)} EGP"),
+                buildSummaryCard("Total Discount", "${totalDiscount.toStringAsFixed(2)} EGP"),
+                buildSummaryCard("After Discount", "${totalAfterDiscount.toStringAsFixed(2)} EGP"),
+                buildSummaryCard("Total Paid", "${totalPaid.toStringAsFixed(2)} EGP"),
+                buildSummaryCard("Total UnPaid", "${totalUnPaid.toStringAsFixed(2)} EGP"),
+                buildSummaryCard("Total Use", "${totalUse.toStringAsFixed(2)} EGP"),
+                buildSummaryCard("Total UnUsed", "${totalUnused.toStringAsFixed(2)} EGP"),
+                buildSummaryCard("Refund", "${totalRefund.toStringAsFixed(2)} EGP"),
               ],
             ),
           ),
@@ -243,55 +159,25 @@ Widget buildSummaryTab() {
 }
 
 /// A helper function that builds a single summary card in the grid.
-Widget buildSummaryCard(String title, String value, IconData icon) {
+Widget buildSummaryCard(String title, String value) {
   return Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Colors.grey[200],
       borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.05),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
-        ),
-      ],
     ),
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2E7D8F).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: const Color(0xFF2E7D8F),
-            size: 20,
-          ),
-        ),
-        const SizedBox(height: 12),
         Text(
           title,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[600],
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2E7D8F),
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
       ],

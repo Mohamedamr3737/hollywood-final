@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:s_medi/general/consts/consts.dart';
+import 'package:s_medi/general/services/alert_service.dart';
 
 class SignupController extends GetxController {
   var nameController = TextEditingController();
@@ -14,57 +16,51 @@ class SignupController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   signupUser(BuildContext context) async {
-    if (formKey.currentState!.validate()) {
-      try {
-        isLoading(true);
-        final response = await http.post(
-          Uri.parse('https://portal.ahmed-hussain.com/api/patient/auth/register'),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'name': nameController.text,
-            'phone': phoneController.text,
-            'email': emailController.text,
-            'gender': selectedGender.value,
-            'password': passwordController.text,
-            'password_confirmation': confirmPasswordController.text,
-          }),
-        );
-        final responseData = jsonDecode(response.body);
-        if (responseData['status']) {
-          print(responseData['status']);
+    try {
+      isLoading(true);
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/api/patient/auth/register'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'name': nameController.text,
+          'phone': phoneController.text,
+          'email': emailController.text,
+          'gender': selectedGender.value,
+          'password': passwordController.text,
+          'password_confirmation': confirmPasswordController.text,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      if (responseData['status']) {
+        print(responseData['status']);
 
-          // Assuming the API returns a success message
-          Get.snackbar(
-            'Success',
-            'Signup Successful!',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
-        } else {
-          print(responseData);
-          // Assuming the API returns error messages in `message`
-          Get.snackbar(
-            'Error',
-            responseData['message']['phone'].toString() ?? 'Signup Failed!',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-          );
+        // Assuming the API returns a success message
+        AlertService.success(context, 'Signup Successful!');
+      } else {
+        print(responseData);
+
+        String errorMessage = 'Signup Failed!';
+
+        if (responseData['message'] is Map && responseData['message'].isNotEmpty) {
+          // Get the first error message dynamically
+          var firstKey = responseData['message'].keys.first;
+          var firstError = responseData['message'][firstKey];
+          if (firstError is List && firstError.isNotEmpty) {
+            errorMessage = firstError.first;
+          } else if (firstError is String) {
+            errorMessage = firstError;
+          }
         }
-      } catch (e) {
-        Get.snackbar(
-          'Error',
-          'An error occurred. Please try again later.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-      } finally {
-        isLoading(false);
+
+        AlertService.error(context, errorMessage);
       }
+
+    } catch (e) {
+      AlertService.error(context, 'An error occurred. Please try again later.');
+    } finally {
+      isLoading(false);
     }
   }
 

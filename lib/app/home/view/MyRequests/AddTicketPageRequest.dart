@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../controller/requests_controller.dart';
-import '../../../../general/consts/colors.dart';
+import 'package:s_medi/general/services/alert_service.dart';
 
 class AddTicketPage extends StatefulWidget {
   final int category;
@@ -30,6 +30,8 @@ class _AddTicketPageState extends State<AddTicketPage> {
     _detailsCtrl.dispose();
     super.dispose();
   }
+
+
 
   Future<void> _pickDocument() async {
     final result = await FilePicker.platform.pickFiles(
@@ -61,9 +63,7 @@ class _AddTicketPageState extends State<AddTicketPage> {
     final details = _detailsCtrl.text.trim();
 
     if (title.isEmpty || details.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields")),
-      );
+      AlertService.fillFields(context);
       return;
     }
 
@@ -103,320 +103,185 @@ class _AddTicketPageState extends State<AddTicketPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Column(
+      // Same sparkly background + lotus style
+      body: Stack(
         children: [
-          // Header Section
-          Container(
-            height: 280,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
+          // Sparkly background
+          Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 150,
+                child: Image.network(
+                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            child: Stack(
-              children: [
-                // Background image with overlay
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                      image: DecorationImage(
-                        image: const NetworkImage(
-                          'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
-                        ),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.withOpacity(0.8),
-                          BlendMode.overlay,
-                        ),
-                      ),
-                    ),
+              const SizedBox(height: 100),
+            ],
+          ),
+          // Lotus
+          Positioned(
+            top: 110,
+            left: MediaQuery.of(context).size.width / 2 - 70,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                // AppBar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: const Text(
-                      'Add Ticket',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    centerTitle: true,
+                ],
+                image: const DecorationImage(
+                  image: NetworkImage(
+                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
                   ),
+                  fit: BoxFit.cover,
                 ),
-                // Circular Icon and Title
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.add_task,
-                          size: 50,
-                          color: Color(0xFF2E7D8F),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Create New Request',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+            )
+
+          ),
+          // AppBar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppBar(
+              backgroundColor: Colors.black.withOpacity(0.7),
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: const Text(
+                "Add Ticket",
+                style: TextStyle(
+                  color: Colors.orangeAccent,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
+              ),
+              centerTitle: true,
             ),
           ),
-          // Content
-          Expanded(
+          // Form
+          Positioned.fill(
+            top: 250,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
                   if (_isLoading)
-                    const Center(child: CircularProgressIndicator(color: Color(0xFF2E7D8F)))
+                    const Center(child: CircularProgressIndicator())
                   else ...[
                     if (_errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withOpacity(0.3)),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.error_outline, color: Colors.red[600]),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: TextStyle(color: Colors.red[600]),
-                              ),
-                            ),
-                          ],
-                        ),
+                      Text(
+                        "Error: $_errorMessage",
+                        style: const TextStyle(color: Colors.red),
                       ),
                       const SizedBox(height: 16),
                     ],
                     // Title
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TextFormField(
-                        controller: _titleCtrl,
-                        decoration: InputDecoration(
-                          labelText: "Title",
-                          hintText: "Enter title",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[50],
-                          contentPadding: const EdgeInsets.all(20),
+                    TextFormField(
+                      controller: _titleCtrl,
+                      decoration: InputDecoration(
+                        labelText: "Title",
+                        hintText: "Enter title",
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     // Details
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TextFormField(
-                        controller: _detailsCtrl,
-                        minLines: 3,
-                        maxLines: 6,
-                        decoration: InputDecoration(
-                          labelText: "Details",
-                          hintText: "Enter details",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[50],
-                          contentPadding: const EdgeInsets.all(20),
+                    TextFormField(
+                      controller: _detailsCtrl,
+                      minLines: 3,
+                      maxLines: 6,
+                      decoration: InputDecoration(
+                        labelText: "Details",
+                        hintText: "Enter details",
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     // Attach file
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Attach files",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
+                    Row(
+                      children: [
+                        const Text("Attach files"),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF2E7D8F),
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                  ),
-                                  onPressed: _pickDocument,
-                                  icon: const Icon(Icons.file_copy),
-                                  label: const Text("Document"),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF2E7D8F),
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                  ),
-                                  onPressed: _pickMedia,
-                                  icon: const Icon(Icons.photo_library),
-                                  label: const Text("Media"),
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (_filePaths.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            Text(
-                              "Selected files:",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[700],
-                              ),
+                          onPressed: _pickDocument,
+                          child: const Text("Document", style: TextStyle(color: Colors.white)),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            const SizedBox(height: 8),
-                            ...(_filePaths.map((path) => Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.file_present, color: Colors.grey[600]),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      path.split('/').last,
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.close, color: Colors.red[400]),
-                                    onPressed: () {
-                                      setState(() {
-                                        _filePaths.remove(path);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ))),
-                          ],
-                        ],
-                      ),
+                          ),
+                          onPressed: _pickMedia,
+                          child: const Text("Media", style: TextStyle(color: Colors.white)),
+                        ),
+                      ],
                     ),
+                    if (_filePaths.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _filePaths.map((path) {
+                            final fileName = path.split('/').last;
+                            return Text(
+                              fileName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.black54),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     const SizedBox(height: 24),
+                    // Submit
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton.icon(
+                      child: ElevatedButton(
                         onPressed: _createTicket,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2E7D8F),
-                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
                         ),
-                        icon: const Icon(Icons.send),
-                        label: const Text(
-                          "Create Ticket",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        child: const Text(
+                          "Add new ticket",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),

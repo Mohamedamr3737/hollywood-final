@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../auth/controller/token_controller.dart';
-import 'package:get/get.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 // -----------------------------
 // Model Classes
@@ -86,81 +85,12 @@ class Category {
 /// -----------------------------------------
 /// Controller class to fetch categories
 /// -----------------------------------------
-class MyDataController extends GetxController {
-  var isLoading = false.obs;
-  var errorMessage = ''.obs;
-  var myDataList = <DataItem>[].obs;
-  var categories = <Category>[].obs;
+class MyDataController {
 
-  @override
-  void onInit() {
-    super.onInit();
-    _initializeData();
-  }
-
-  Future<void> _initializeData() async {
-    try {
-      await fetchCategories();
-      // Fetch data for the first category if available
-      if (categories.isNotEmpty) {
-        await fetchMyData(categories.first.id);
-      }
-    } catch (e) {
-      errorMessage(e.toString());
-    }
-  }
-
-  Future<void> fetchMyData(int categoryId) async {
-    try {
-      isLoading(true);
-      errorMessage('');
-      
-      final dataResponse = await fetchData(categoryId);
-      myDataList.assignAll(dataResponse.myData);
-    } catch (e) {
-      errorMessage(e.toString());
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  Future<void> fetchCategories() async {
-    try {
-      String? token = await getAccessToken();
-      const String apiUrl =
-          'https://portal.ahmed-hussain.com/api/patient/my-data/categories';
-
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> body = json.decode(response.body);
-        if (body['status'] == true) {
-          final List<dynamic> data = body['data'];
-          final categoryList = data.map((json) => Category.fromJson(json)).toList();
-          categories.assignAll(categoryList);
-        } else {
-          throw Exception('API error: ${body['message']}');
-        }
-      } else {
-        throw Exception(
-            'Failed to load categories. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      errorMessage(e.toString());
-      rethrow;
-    }
-  }
-
-  Future<DataResponse> fetchData(int categoryId) async {
-    String? token = await getAccessToken();
+  Future<List<Category>> fetchCategories() async {
+    String? token= await getAccessToken();
     final String apiUrl =
-        'https://portal.ahmed-hussain.com/api/patient/my-data/data?category_id=$categoryId';
+        '${ApiConfig.baseUrl}/api/patient/my-data/categories';
 
     final response = await http.get(
       Uri.parse(apiUrl),
@@ -171,7 +101,39 @@ class MyDataController extends GetxController {
     );
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> body = json.decode(response.body);
+      if (body['status'] == true) {
+        final List<dynamic> data = body['data'];
+        return data.map((json) => Category.fromJson(json)).toList();
+      } else {
+        throw Exception('API error: ${body['message']}');
+      }
+    } else {
+      throw Exception(
+          'Failed to load categories. Status code: ${response.statusCode}');
+    }
+  }
+
+  Future<DataResponse> fetchData(int categoryId) async {
+    String? token= await getAccessToken();
+    print("clicked");
+    print(categoryId);
+    final String apiUrl =
+        '${ApiConfig.baseUrl}/api/patient/my-data/data?category_id=$categoryId';
+
+    final response = await http.get(
+      Uri.parse(apiUrl),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    print('objectzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz');
+    print(response);
+    if (response.statusCode == 200) {
       final Map<String, dynamic> jsonBody = json.decode(response.body);
+      print('objectzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz');
+      print(jsonBody);
       if (jsonBody['status'] == true) {
         return DataResponse.fromJson(jsonBody['data']);
       } else {

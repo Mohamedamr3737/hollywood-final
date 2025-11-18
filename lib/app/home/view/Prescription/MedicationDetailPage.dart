@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../general/consts/colors.dart';
+import 'package:s_medi/general/services/alert_service.dart';
 
 class MedicationDetailPage extends StatefulWidget {
   // The entire prescription object, e.g.:
@@ -37,9 +37,7 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
       initialTime: TimeOfDay.now(),
     );
     if (time != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Reminder set at ${time.format(context)}")),
-      );
+      AlertService.success(context, "Reminder set at ${time.format(context)}");
     }
   }
 
@@ -50,201 +48,150 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
     final medications = widget.prescription['medications'] as List<dynamic>? ?? [];
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Column(
+      // Same background style
+      body: Stack(
         children: [
-          // Header Section
-          Container(
-            height: 280,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
+          // top background
+          Column(
+            children: [
+              SizedBox(
+                height: 150,
+                width: double.infinity,
+                child: Image.network(
+                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            child: Stack(
-              children: [
-                // Background image with overlay
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                      image: DecorationImage(
-                        image: const NetworkImage(
-                          'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
-                        ),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.withOpacity(0.8),
-                          BlendMode.overlay,
-                        ),
-                      ),
-                    ),
+              const SizedBox(height: 100),
+            ],
+          ),
+          // lotus icon
+          Positioned(
+            top: 110,
+            left: MediaQuery.of(context).size.width / 2 - 70,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                // AppBar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: Text(
-                      docName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    centerTitle: true,
+                ],
+                image: const DecorationImage(
+                  image: NetworkImage(
+                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
                   ),
+                  fit: BoxFit.cover,
                 ),
-                // Circular Icon and Title
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.medication,
-                          size: 50,
-                          color: Color(0xFF2E7D8F),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Medication Details',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+            )
+
+          ),
+          // custom appbar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppBar(
+              backgroundColor: Colors.black.withOpacity(0.7),
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Text(
+                docName, // show the doctor's name in the title
+                style: const TextStyle(
+                  color: Colors.orangeAccent,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
+              ),
+              centerTitle: true,
             ),
           ),
-          // Content
-          Expanded(
+          // content
+          Positioned.fill(
+            top: 240,
             child: medications.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.medication, size: 80, color: Colors.grey),
-                        SizedBox(height: 20),
-                        Text('No Medication Found!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey)),
-                        SizedBox(height: 8),
-                        Text('No medications for this prescription.', style: TextStyle(fontSize: 16, color: Colors.grey), textAlign: TextAlign.center),
-                      ],
-                    ),
-                  )
+                ? const Center(
+              child: Text(
+                "No Medication Found!",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: medications.length,
-                    itemBuilder: (ctx, i) {
-                      final medItem = medications[i];
-                      final medName = medItem['medication_name'] ?? '';
-                      final times = medItem['times']?.toString() ?? '';
-                      final form = medItem['form'] ?? '';
-                      final comment = medItem['comment'] ?? '';
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
+              padding: const EdgeInsets.all(16),
+              itemCount: medications.length,
+              itemBuilder: (ctx, i) {
+                final medItem = medications[i];
+                final medName = medItem['medication_name'] ?? '';
+                final times = medItem['times']?.toString() ?? '';
+                final form = medItem['form'] ?? '';
+                final comment = medItem['comment'] ?? '';
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Medication
+                        Text(
+                          "Medication\n$medName",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // Times, Form
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Times\n$times"),
+                            Text("Form\n$form"),
                           ],
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF2E7D8F).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Icon(Icons.medication, color: Color(0xFF2E7D8F), size: 24),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    medName,
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
+                        const SizedBox(height: 4),
+                        // Comment
+                        Text(
+                          "Comment\n$comment",
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        const SizedBox(height: 12),
+                        // "Set A Reminder" button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _setReminder,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Times: $times', style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                                Text('Form: $form', style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text('Comment: $comment', style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: _setReminder,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF2E7D8F),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.alarm),
-                                label: const Text('Set A Reminder', style: TextStyle(fontWeight: FontWeight.bold)),
+                            child: const Text(
+                              "Set A Reminder",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    },
+                          ),
+                        )
+                      ],
+                    ),
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),

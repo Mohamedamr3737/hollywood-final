@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../../general/consts/consts.dart';
+import '../../../general/services/alert_service.dart';
 import '../../auth/controller/token_controller.dart';
 
 class SessionController extends GetxController {
@@ -12,7 +13,7 @@ class SessionController extends GetxController {
   // Separate lists for regions and session details
   var regions = <Map<String, dynamic>>[].obs;  // Holds session regions
   var sessionDetails = <Map<String, dynamic>>[].obs;  // Holds details of sessions in a region
-  var availableTimes = <Map<String, dynamic>>[].obs;  // Holds available times for a session
+  var availableTimes = <Map<String, dynamic>>[].obs; // ✅ For session times
 
   @override
   void onInit() async {
@@ -20,6 +21,58 @@ class SessionController extends GetxController {
     fetchSessions();
   }
 
+
+  /// ✅ Fetch Available Times for a Session
+  Future<void> fetchAvailableTimes(int sessionId, String date) async {
+    try {
+      isLoading(true);
+      availableTimes.clear();
+      var bearerToken = await getAccessToken();
+      errorMessage.value = "";
+
+      // Ensure date is in YYYY-MM-DD format
+      DateTime parsedDate = DateTime.parse(date);
+      String formattedDate =
+          "${parsedDate.year}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.day.toString().padLeft(2, '0')}";
+
+      final url =
+          "${ApiConfig.baseUrl}/api/patient/sessions/session-time?session_id=$sessionId&date=$formattedDate";
+
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $bearerToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+
+        if (jsonData["status"] == true && jsonData["data"] != null) {
+          availableTimes.value = List<Map<String, dynamic>>.from(
+            jsonData["data"].map((item) {
+              return {
+                "time": item["value"] ?? "No time",
+                "room_id": item["room_id"] ?? 0,
+              };
+            }),
+          );
+        } else {
+          errorMessage.value = "No available times found.";
+        }
+      } else {
+        errorMessage.value = "HTTP Error: ${response.statusCode}";
+      }
+    } catch (e) {
+      errorMessage.value = "Something went wrong!";
+
+    } finally {
+      isLoading(false);
+    }
+  }
   /// **Fetch Available Regions**
   Future<void> fetchSessions() async {
     try {
@@ -27,36 +80,29 @@ class SessionController extends GetxController {
       var bearerToken= await getAccessToken();
       errorMessage.value = "";
 
-      print("Fetching regions...");
 
       final response = await http.get(
-        Uri.parse("https://portal.ahmed-hussain.com/api/patient/sessions/region"),
+        Uri.parse("${ApiConfig.baseUrl}/api/patient/sessions/region"),
         headers: {
           'Authorization': 'Bearer $bearerToken',
           'Content-Type': 'application/json',
         },
       );
 
-      print("Response Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
 
         if (jsonData["status"] == true && jsonData["data"] != null) {
           regions.value = List<Map<String, dynamic>>.from(jsonData["data"]);
-          print("Regions Fetched: ${regions.length}");
         } else {
           errorMessage.value = "No regions found.";
-          print("API Error: ${jsonData['message']}");
         }
       } else {
         errorMessage.value = "HTTP Error: ${response.statusCode}";
-        print("HTTP Error: ${response.reasonPhrase}");
       }
     } catch (e) {
       errorMessage.value = "Something went wrong!";
-      print("Exception: $e");
     } finally {
       isLoading(false);
     }
@@ -70,18 +116,15 @@ class SessionController extends GetxController {
       errorMessage2.value = "";
       sessionDetails.clear();  // Clear old session details before fetching new ones
 
-      print("Fetching session details for region_id: $regionId...");
 
       final response = await http.get(
-        Uri.parse("https://portal.ahmed-hussain.com/api/patient/sessions?region_id=$regionId"),
+        Uri.parse("${ApiConfig.baseUrl}/api/patient/sessions?region_id=$regionId"),
         headers: {
           'Authorization': 'Bearer $bearerToken',
           'Content-Type': 'application/json',
         },
       );
 
-      print("Response Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -114,7 +157,6 @@ class SessionController extends GetxController {
               "updated_at": session["updated_at"] ?? "1970-01-01T00:00:00.000000Z",
             };
           }));
-          print("Sessions in Region $regionId Fetched: ${sessionDetails.length}");
         } else {
           errorMessage2.value = "No sessions found in this region.";
         }
@@ -123,45 +165,6 @@ class SessionController extends GetxController {
       }
     } catch (e) {
       errorMessage2.value = "Something went wrong!";
-      print("Exception: $e");
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  /// **Fetch Available Times for a Session**
-  Future<void> fetchSessionTimes(int sessionId, String date) async {
-    try {
-      isLoading(true);
-      var bearerToken = await getAccessToken();
-      availableTimes.clear();  // Clear old times before fetching new ones
-
-      print("Fetching available times for session_id: $sessionId on date: $date...");
-
-      final response = await http.get(
-        Uri.parse("https://portal.ahmed-hussain.com/api/patient/sessions/session-time?session_id=$sessionId&date=$date"),
-        headers: {
-          'Authorization': 'Bearer $bearerToken',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      print("Response Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        var jsonData = json.decode(response.body);
-        if (jsonData["status"] == true && jsonData["data"] != null) {
-          availableTimes.value = List<Map<String, dynamic>>.from(jsonData["data"]);
-          print("Available Times for Session $sessionId on $date Fetched: ${availableTimes.length}");
-        } else {
-          print("No available times found for this session on $date.");
-        }
-      } else {
-        print("HTTP Error: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Exception: $e");
     } finally {
       isLoading(false);
     }
@@ -170,13 +173,6 @@ class SessionController extends GetxController {
   /// **Clear session details when exiting a region page**
   void clearSessionDetails() {
     sessionDetails.clear();
-    print("Session details cleared");
-  }
-
-  /// **Clear available times when no longer needed**
-  void clearAvailableTimes() {
-    availableTimes.clear();
-    print("Available times cleared");
   }
 
   Future<bool> setSessionTime({
@@ -207,10 +203,9 @@ class SessionController extends GetxController {
           "$hour:${minute.toString().padLeft(2, '0')}:00$period"; // Ensure g:i:sA format
 
       final Uri url = Uri.parse(
-          "https://portal.ahmed-hussain.com/api/patient/sessions/set-time"
+          "${ApiConfig.baseUrl}/api/patient/sessions/set-time"
               "?date=$formattedDate&time=$formattedTime&room_id=$roomId&session_id=$sessionId");
 
-      print("📤 Sending request to: $url");
 
       final response = await http.post(
         url,
@@ -220,8 +215,6 @@ class SessionController extends GetxController {
         },
       );
 
-      print("📥 Response Code: ${response.statusCode}");
-      print("📥 Response Body: ${response.body}");
 
       var jsonData = json.decode(response.body);
 
@@ -229,23 +222,46 @@ class SessionController extends GetxController {
         if (jsonData["status"] == true) {
           successMessage.value =
               jsonData["message"] ?? "Time set successfully!";
-          VxToast.show(context, msg: successMessage.value);
-          print("✅ Success: ${successMessage.value}");
+          AlertService.success(context, successMessage.value);
           await fetchSessionDetails(jsonData['data']['region_id']);
           // update(); // ✅ Forces UI Rebuild
           isSuccess=true;
-        } else {
-          VxToast.show(context, msg: jsonData["message"]["time"][0] ??
-              "Failed to set time.");
-          print("❌ API Error: ${errorMessage.value}");
-        }
+          } else {
+            // print(jsonData["message"]["date"][0]);
+            // Handle different message formats
+            String errorMsg = "Failed to set time.";
+            if (jsonData["message"] is Map) {
+              // Check for different field errors (date, time, room_id, etc.)
+              if (jsonData["message"]["date"] is List && jsonData["message"]["date"].isNotEmpty) {
+                errorMsg = jsonData["message"]["date"][0];
+              } else if (jsonData["message"]["time"] is List && jsonData["message"]["time"].isNotEmpty) {
+                errorMsg = jsonData["message"]["time"][0];
+              } else if (jsonData["message"]["room_id"] is List && jsonData["message"]["room_id"].isNotEmpty) {
+                errorMsg = jsonData["message"]["room_id"][0];
+              } else if (jsonData["message"]["session_id"] is List && jsonData["message"]["session_id"].isNotEmpty) {
+                errorMsg = jsonData["message"]["session_id"][0];
+              } else {
+                // If no specific field error, get the first available error
+                var firstError = jsonData["message"].values.firstWhere(
+                  (value) => value is List && value.isNotEmpty,
+                  orElse: () => null,
+                );
+                if (firstError != null && firstError.isNotEmpty) {
+                  errorMsg = firstError[0];
+                }
+              }
+            } else if (jsonData["message"] is String) {
+              errorMsg = jsonData["message"];
+            }
+            AlertService.error(context, errorMsg);
+          }
       } else {
-        VxToast.show(context, msg: "HTTP Error: ${response.statusCode}");
-        print("❌ HTTP Error: ${response.reasonPhrase}");
+        AlertService.serverError(context, "HTTP Error: ${response.statusCode}");
       }
     } catch (e) {
-      VxToast.show(context, msg: "Something went wrong!");
-      print("❌ Exception: $e");
+
+      AlertService.error(context, e.toString());
+      print(e);
     } finally {
       isLoading(false);
     }
@@ -264,10 +280,9 @@ class SessionController extends GetxController {
       successMessage.value = "";
 
       final Uri url = Uri.parse(
-        "https://portal.ahmed-hussain.com/api/patient/sessions/cancel-time?session_id=$sessionId",
+        "${ApiConfig.baseUrl}/api/patient/sessions/cancel-time?session_id=$sessionId",
       );
 
-      print("📤 Sending request to: $url");
 
       final response = await http.post(
         url,
@@ -277,8 +292,6 @@ class SessionController extends GetxController {
         },
       );
 
-      print("📥 Response Code: ${response.statusCode}");
-      print("📥 Response Body: ${response.body}");
 
       var jsonData = json.decode(response.body);
 
@@ -286,8 +299,7 @@ class SessionController extends GetxController {
         if (jsonData["status"] == true) {
           successMessage.value =
               jsonData["message"] ?? "Time canceled successfully!";
-          VxToast.show(context, msg: successMessage.value);
-          print("✅ Success: ${successMessage.value}");
+          AlertService.success(context, successMessage.value);
 
           // Refresh session data if needed
           await fetchSessionDetails(jsonData['data']['region_id']);
@@ -295,17 +307,23 @@ class SessionController extends GetxController {
           // Indicate success
           isSuccess = jsonData['status'];
         } else {
-          VxToast.show(context, msg: jsonData["message"] ??
-              "Failed to cancel time.");
-          print("❌ API Error: ${errorMessage.value}");
+          // Handle different message formats
+          String errorMsg = "Failed to cancel time.";
+          if (jsonData["message"] is Map) {
+            // If message is a map, try to get the first error or use a default
+            if (jsonData["message"].values.isNotEmpty) {
+              errorMsg = jsonData["message"].values.first.toString();
+            }
+          } else if (jsonData["message"] is String) {
+            errorMsg = jsonData["message"];
+          }
+          AlertService.error(context, errorMsg);
         }
       } else {
-        VxToast.show(context, msg: "HTTP Error: ${response.statusCode}");
-        print("❌ HTTP Error: ${response.reasonPhrase}");
+        AlertService.serverError(context, "HTTP Error: ${response.statusCode}");
       }
     } catch (e) {
-      VxToast.show(context, msg: "Something went wrong!");
-      print("❌ Exception: $e");
+      AlertService.error(context, "Something went wrong!");
     } finally {
       isLoading(false);
     }

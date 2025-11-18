@@ -1,4 +1,4 @@
-import '/general/consts/consts.dart';
+import 'package:s_medi/general/consts/consts.dart';
 
 class AppFontSize {
   static const size12 = 12.0,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:ui';
 import '../../controller/session_controller.dart';
 import 'sessionByRegionPage.dart';
 import '../../../auth/controller/token_controller.dart';
-import '../../../../general/consts/colors.dart';
 
 class MySessionsPage extends StatelessWidget {
   const MySessionsPage({super.key});
@@ -19,304 +19,264 @@ class MySessionsPage extends StatelessWidget {
       sessionController.fetchSessions();
     });
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              // Header Section
-              Container(
-                height: 280,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
+    final double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+
+    Widget _buildSessionOption(BuildContext context, String imageUrl,
+        String label, double screenWidth, int regionId) {
+      double iconSize = screenWidth * 0.3;
+      double fontSize = screenWidth * 0.04;
+
+      return GestureDetector(
+        onTap: () {
+          Get.to(() => SessionListPage(regionId: regionId, regionName: label));
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              children: [
+                // Main glass container
+                Container(
+                  width: iconSize,
+                  height: iconSize,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    image: DecorationImage(
+                      image: NetworkImage(imageUrl),
+                      fit: BoxFit.cover,
+                    ),
+                    // Enhanced shadow for depth
+                    boxShadow: [
+                      // Deep shadow
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 25,
+                        offset: const Offset(0, 15),
+                        spreadRadius: 2,
+                      ),
+                      // Medium shadow
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                      // Subtle inner glow
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, -3),
+                      ),
+                    ],
                   ),
-                ),
-                child: Stack(
-                  children: [
-                    // Background image with overlay
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(30),
-                            bottomRight: Radius.circular(30),
-                          ),
-                          image: DecorationImage(
-                            image: const NetworkImage(
-                              'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Stack(
+                      children: [
+                        // Glass overlay with realistic effects
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            // Multi-layer glass effect
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white.withOpacity(0.4), // Top highlight
+                                Colors.white.withOpacity(0.1), // Mid transparency
+                                Colors.white.withOpacity(0.05), // Bottom subtle
+                                Colors.black.withOpacity(0.1), // Bottom depth
+                              ],
+                              stops: const [0.0, 0.3, 0.7, 1.0],
                             ),
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                              AppColors.primaryColor.withOpacity(0.8),
-                              BlendMode.overlay,
+                            // Glass border
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1.5,
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    // AppBar
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: AppBar(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        leading: IconButton(
-                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                        title: const Text(
-                          "My Sessions",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        centerTitle: true,
-                      ),
-                    ),
-                    // Circular Icon and Title
-                    Positioned(
-                      bottom: 20,
-                      left: 0,
-                      right: 0,
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 100,
-                            height: 100,
+                        // Static highlight spots for extra realism
+                        Positioned(
+                          top: iconSize * 0.15,
+                          left: iconSize * 0.2,
+                          child: Container(
+                            width: iconSize * 0.1,
+                            height: iconSize * 0.1,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                              image: const DecorationImage(
-                                image: NetworkImage(
-                                  'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
-                                ),
-                                fit: BoxFit.cover,
-                              ),
+                              color: Colors.white.withOpacity(0.3),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'Treatment Sessions',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                        ),
+                        // Secondary highlight
+                        Positioned(
+                          top: iconSize * 0.3,
+                          right: iconSize * 0.15,
+                          child: Container(
+                            width: iconSize * 0.15,
+                            height: iconSize * 0.15,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.2),
                             ),
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                shadows: [
+                  Shadow(
+                    color: Colors.white.withOpacity(0.8),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: Column(
+        children: [
+          // **1️⃣ AppBar at the Top**
+          AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            title: const Text(
+              "My Sessions",
+              style: TextStyle(
+                color: Colors.orangeAccent,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            centerTitle: true,
+          ),
+
+          // **2️⃣ Stack for Background & Circular Image**
+          Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              Image.network(
+                'https://t3.ftcdn.net/jpg/03/66/08/34/360_F_366083470_jTuk7ZhaXxlk3paaPIxxPv2jUQhe1tQb.jpg',
+                height: screenHeight * 0.25,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+              Positioned(
+                bottom: -screenHeight * 0.06,
+                child: Container(
+                  width: screenWidth * 0.35,
+                  height: screenWidth * 0.35,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    image: const DecorationImage(
+                      image: NetworkImage(
+                          'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg'),
+                      fit: BoxFit.cover,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // **3️⃣ Space Below Circular Image to Prevent Overlap**
+          const SizedBox(height: 50),
+
+          // **4️⃣ Expanded Section for the Session List**
+          Expanded(
+            child: Obx(() {
+              if (sessionController.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (sessionController.errorMessage.isNotEmpty) {
+                return Center(
+                  child: Text(
+                    sessionController.errorMessage.value,
+                    style: const TextStyle(fontSize: 18, color: Colors.red),
+                  ),
+                );
+              }
+
+              if (sessionController.regions.isEmpty) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.event_note, size: 100, color: Colors.grey),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "No Sessions Available",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
                     ),
                   ],
+                );
+              }
+
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: screenWidth * 0.04,
+                  mainAxisSpacing: screenHeight * 0.03,
+                  shrinkWrap: true,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: sessionController.regions
+                      .map((session) => _buildSessionOption(
+                    context,
+                    session["icon"] ?? "",
+                    session["title"] ?? "",
+                    screenWidth,
+                    session['id'] ?? "",
+                  ))
+                      .toList(),
                 ),
-              ),
-              
-              // Content
-              Expanded(
-                child: Obx(() {
-                  if (sessionController.isLoading.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF2E7D8F),
-                      ),
-                    );
-                  }
-
-                  if (sessionController.errorMessage.isNotEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 64,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Unable to load sessions',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            sessionController.errorMessage.value,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[500],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: () => sessionController.fetchSessions(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2E7D8F),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  if (sessionController.regions.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.event_note_outlined,
-                            size: 80,
-                            color: Colors.grey[300],
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'No Sessions Available',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Your treatment sessions will appear here',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[500],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 1.1,
-                      ),
-                      itemCount: sessionController.regions.length,
-                      itemBuilder: (context, index) {
-                        final session = sessionController.regions[index];
-                        return _buildSessionCard(
-                          context,
-                          session["icon"] ?? "",
-                          session["title"] ?? "",
-                          session['id'] ?? 0,
-                        );
-                      },
-                    ),
-                  );
-                }),
-              ),
-            ],
+              );
+            }),
           ),
         ],
       ),
     );
-  }
 
-  Widget _buildSessionCard(BuildContext context, String imageUrl, String label, int regionId) {
-    return InkWell(
-      onTap: () {
-        Get.to(() => SessionListPage(regionId: regionId, regionName: label));
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Session Icon
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color(0xFF2E7D8F).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: imageUrl.isNotEmpty
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(
-                            Icons.event_note_outlined,
-                            color: Color(0xFF2E7D8F),
-                            size: 30,
-                          );
-                        },
-                      ),
-                    )
-                  : const Icon(
-                      Icons.event_note_outlined,
-                      color: Color(0xFF2E7D8F),
-                      size: 30,
-                    ),
-            ),
-            const SizedBox(height: 12),
-            // Session Title
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

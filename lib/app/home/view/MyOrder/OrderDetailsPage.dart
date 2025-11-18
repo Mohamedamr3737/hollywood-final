@@ -1,6 +1,5 @@
 // order_details_page.dart
 import 'package:flutter/material.dart';
-import '../../../../general/consts/colors.dart';
 
 class OrderDetailsPage extends StatelessWidget {
   final Map<String, dynamic> order;
@@ -13,164 +12,141 @@ class OrderDetailsPage extends StatelessWidget {
     final status = order['status']?.toString() ?? "";
     final totalStr = order['total']?.toString() ?? "0.00";
     final dateStr = order['created_at']?.toString() ?? "";
+
+    // The items array
     final List<dynamic> items = order["items"] as List<dynamic>? ?? [];
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Column(
+      body: Stack(
         children: [
-          // Header Section
-          Container(
-            height: 280,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
+          // Top background image
+          Column(
+            children: [
+              SizedBox(
+                height: 150,
+                width: double.infinity,
+                child: Image.network(
+                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            child: Stack(
-              children: [
-                // Background image with overlay
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                      image: DecorationImage(
-                        image: const NetworkImage(
-                          'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
-                        ),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.withOpacity(0.8),
-                          BlendMode.overlay,
-                        ),
-                      ),
-                    ),
+              const SizedBox(height: 60),
+            ],
+          ),
+          // Circle logo (or lotus)
+          Positioned(
+            top: 110,
+            left: MediaQuery.of(context).size.width / 2 - 60,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                // AppBar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: Text(
-                      'Order Details #$orderId',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    centerTitle: true,
+                ],
+                image: const DecorationImage(
+                  image: NetworkImage(
+                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
                   ),
+                  fit: BoxFit.cover,
                 ),
-                // Circular Icon and Title
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.shopping_bag_outlined,
-                          size: 50,
-                          color: Color(0xFF2E7D8F),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Order Details',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+            )
+
+          ),
+          // Custom app bar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppBar(
+              backgroundColor: Colors.black.withOpacity(0.7),
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Text(
+                "Order Details #$orderId",
+                style: const TextStyle(
+                  color: Colors.orangeAccent,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
+              ),
+              centerTitle: true,
             ),
           ),
           // Content
-          Expanded(
+          Positioned.fill(
+            top: 200,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Status and date
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildStatusBadge(status),
-                      Row(
-                        children: [
-                          const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey),
-                          const SizedBox(width: 8),
-                          Text(
-                            dateStr,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Status and date in a row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          status,
+                          style: const TextStyle(
+                            color: Colors.orangeAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  // Items label
-                  const Text(
-                    "Items",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                        ),
+                        Text(
+                          dateStr,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Items list
-                  ...items.map((item) => _buildOrderItemCard(item as Map<String, dynamic>)).toList(),
-                  const SizedBox(height: 24),
-                  // Summary
-                  _buildLabelValueRow("Quantity", order["qty"]?.toString() ?? "0"),
-                  const Divider(),
-                  _buildLabelValueRow("Subtotal", "EGP "+(order["subtotal"]?.toString() ?? "0.00")),
-                  const Divider(),
-                  _buildLabelValueRow("Discount", "EGP "+(order["discount"]?.toString() ?? "0.00")),
-                  const Divider(),
-                  _buildLabelValueRow(
-                    "Total",
-                    "EGP $totalStr",
-                    isHighlight: true,
-                  ),
-                ],
+                    const SizedBox(height: 16),
+
+                    // Items label
+                    Row(
+                      children: const [
+                        Text(
+                          "Items",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Show each item in a ListView or Column
+                    // We'll just do a Column of item cards for simplicity
+                    ...items.map((item) => _buildOrderItemCard(item as Map<String, dynamic>)).toList(),
+                    const SizedBox(height: 16),
+
+                    // Some summary details
+                    _buildLabelValueRow("Quantity", order["qty"]?.toString() ?? "0"),
+                    const Divider(),
+                    _buildLabelValueRow("Subtotal", "EGP ${order["subtotal"]}"),
+                    const Divider(),
+                    _buildLabelValueRow("Discount", "EGP ${order["discount"]}"),
+                    const Divider(),
+                    _buildLabelValueRow(
+                      "Total",
+                      "EGP $totalStr",
+                      isHighlight: true,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -187,132 +163,66 @@ class OrderDetailsPage extends StatelessWidget {
     final itemSubtotal = item["subtotal"]?.toString() ?? "0.00";
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, 2),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          (itemImage.isEmpty)
-              ? const SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
-                )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    itemImage,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
-                      );
-                    },
-                  ),
-                ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  itemTitle.isEmpty ? "." : itemTitle,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "Qty: $itemQty",
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            "EGP $itemSubtotal",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2E7D8F)),
-          ),
-        ],
+      child: ListTile(
+        leading: (itemImage.isEmpty)
+            ? const SizedBox(
+          width: 50,
+          height: 50,
+          child: Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+        )
+            : Image.network(
+          itemImage,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return const SizedBox(
+              width: 50,
+              height: 50,
+              child: Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+            );
+          },
+        ),
+        title: Text(
+          itemTitle.isEmpty ? "." : itemTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text("$itemQty x EGP $itemSubtotal"),
       ),
     );
   }
 
   Widget _buildLabelValueRow(String label, String value, {bool isHighlight = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: isHighlight ? const Color(0xFF2E7D8F) : Colors.grey[700],
-              fontWeight: isHighlight ? FontWeight.bold : FontWeight.w500,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              color: isHighlight ? const Color(0xFF2E7D8F) : Colors.black87,
-              fontWeight: isHighlight ? FontWeight.bold : FontWeight.w600,
-            ),
-          ),
+          Text(label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isHighlight ? FontWeight.bold : FontWeight.w500,
+                color: isHighlight ? Colors.teal : Colors.grey[800],
+              )),
+          Text(value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isHighlight ? FontWeight.bold : FontWeight.w500,
+                color: isHighlight ? Colors.teal : Colors.black,
+              )),
         ],
-      ),
-    );
-  }
-
-  Widget _buildStatusBadge(String status) {
-    Color color;
-    String label = status;
-    switch (status.toLowerCase()) {
-      case 'pending':
-        color = Colors.orange;
-        label = 'Pending';
-        break;
-      case 'completed':
-        color = Colors.green;
-        label = 'Completed';
-        break;
-      case 'cancelled':
-        color = Colors.red;
-        label = 'Cancelled';
-        break;
-      default:
-        color = Colors.grey;
-        break;
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
       ),
     );
   }

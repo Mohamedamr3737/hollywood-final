@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:s_medi/general/services/alert_service.dart';
 
 class RequestAppointmentPage extends StatefulWidget {
   final void Function(Map<String, String>) onSubmit;
@@ -74,10 +75,7 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
                 };
                 widget.onSubmit(appointment); // Pass data to parent
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Please fill all fields."),
-                  backgroundColor: Colors.red,
-                ));
+                AlertService.warning(context, "Please fill all fields.");
               }
             },
             child: const Text(

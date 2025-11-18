@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart'; // For refreshAccessToken()
+import 'package:s_medi/general/consts/consts.dart';
 
 class BalanceController extends GetxController {
   var isLoading = false.obs;
@@ -23,7 +24,7 @@ class BalanceController extends GetxController {
       String? bearerToken = await getAccessToken();
 
       // 2) Build the request
-      final url = "https://portal.ahmed-hussain.com/api/patient/payment/purchases";
+      final url = "${ApiConfig.baseUrl}/api/patient/payment/purchases";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -66,7 +67,7 @@ class BalanceController extends GetxController {
       errorMessage('');
       var bearerToken = await getAccessToken();
 
-      final url = "https://portal.ahmed-hussain.com/api/patient/payment/paid";
+      final url = "${ApiConfig.baseUrl}/api/patient/payment/paid";
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -112,7 +113,7 @@ class BalanceController extends GetxController {
   var totalUnPaid = 0.0.obs;
   var totalAfterDiscount = 0.0.obs;
 
-  /// Fetch summary info from "https://portal.ahmed-hussain.com/api/patient/profile/my-account"
+  /// Fetch summary info from the API
   /// and store it in the above fields.
   Future<void> fetchSummary() async {
     try {
@@ -120,7 +121,7 @@ class BalanceController extends GetxController {
       errorMessage('');
       final bearerToken = await getAccessToken();
 
-      final url = "https://portal.ahmed-hussain.com/api/patient/profile/my-account";
+      final url = "${ApiConfig.baseUrl}/api/patient/profile/my-account";
       final response = await http.get(
         Uri.parse(url),
         headers: {

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../controller/notifications_controller.dart';
 import 'package:get/get.dart';
 import '../../../auth/controller/token_controller.dart';
+import 'package:s_medi/general/services/alert_service.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -44,9 +45,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         _futureNotifications = _controller.fetchNotifications();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      AlertService.error(context, 'Error: $e');
     }
   }
 
@@ -58,13 +57,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
       setState(() {
         _futureNotifications = _controller.fetchNotifications();
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Notifications cleared')),
-      );
+      AlertService.notificationsCleared(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error clearing notifications: $e')),
-      );
+      AlertService.notificationsError(context, 'Error clearing notifications: $e');
     }
   }
 
