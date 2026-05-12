@@ -4,6 +4,7 @@ import '../../controller/AppointmentsController.dart';
 import 'MyAppointmentsPage.dart';
 import 'RequestAppointment.dart';
 import 'AppointmentDetailsPage.dart';
+import '../../../../general/consts/consts.dart';
 
 class AppointmentsPage extends StatefulWidget {
   const AppointmentsPage({Key? key}) : super(key: key);
@@ -93,7 +94,7 @@ class _AppointmentsPageState extends State<AppointmentsPage>
                 width: double.infinity,
                 height: 200,
                 child: Image.network(
-                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
+                  AppAssets.placeholderImageUrl,
                   fit: BoxFit.cover,
                 ),
               ),

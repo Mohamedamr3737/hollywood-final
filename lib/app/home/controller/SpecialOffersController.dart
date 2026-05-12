@@ -121,4 +121,40 @@ class SpecialOffersController {
       throw Exception(errorMessage);
     }
   }
+
+  /// Registers for an offer by its ID.
+  Future<bool> registerOffer(int offerId) async {
+    try {
+      String? bearerToken = await getAccessToken();
+      final String url = '${ApiConfig.baseUrl}/api/patient/offers/register-offer';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $bearerToken',
+        },
+        body: {
+          'offer_id': offerId.toString(),
+        },
+      );
+
+      print('Register Offer API Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse['status'] == true) {
+          return true;
+        } else {
+          errorMessage = jsonResponse['message'] ?? "Failed to register for offer.";
+          return false;
+        }
+      } else {
+        errorMessage = "Server error: ${response.statusCode}";
+        return false;
+      }
+    } catch (e) {
+      errorMessage = "An error occurred: $e";
+      return false;
+    }
+  }
 }

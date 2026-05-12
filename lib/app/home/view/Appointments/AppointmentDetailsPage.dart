@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../../controller/AppointmentsController.dart';
 import '../../../auth/controller/token_controller.dart'; // for refreshAccessToken()
 import 'package:s_medi/general/services/alert_service.dart';
+import '../../../../general/consts/consts.dart';
 
 class AppointmentDetailPage extends StatefulWidget {
   final Map<String, String> appointment;
@@ -113,7 +114,7 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                 width: double.infinity,
                 height: 200,
                 child: Image.network(
-                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
                 ),
               ),
               // Extra space to accommodate the circular icon

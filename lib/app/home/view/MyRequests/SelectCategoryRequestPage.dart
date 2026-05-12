@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../controller/requests_controller.dart';
 import 'request.dart'; // MyRequestsPage
 import '../../../auth/controller/token_controller.dart';
+import '../../../../general/consts/consts.dart';
 
 class SelectCategoryPage extends StatefulWidget {
   const SelectCategoryPage({Key? key}) : super(key: key);
@@ -35,7 +36,7 @@ class _SelectCategoryPageState extends State<SelectCategoryPage> {
                 width: double.infinity,
                 height: 150,
                 child: Image.network(
-                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),

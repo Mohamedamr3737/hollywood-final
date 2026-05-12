@@ -6,6 +6,8 @@ import 'PurshaseTabBalance.dart';
 import 'paymentstabbalance.dart';
 import '../../../auth/controller/token_controller.dart';
 import 'package:s_medi/general/services/alert_service.dart';
+import '../../../../general/consts/consts.dart';
+import '../../controller/payment_controller.dart';
 
 class MyBalancePage extends StatefulWidget {
   @override
@@ -57,7 +59,7 @@ class _MyBalancePageState extends State<MyBalancePage>
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: NetworkImage(
-                      'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
+                      AppAssets.placeholderImageUrl,
                     ),
                     fit: BoxFit.cover,
                   ),
@@ -143,8 +145,7 @@ class _MyBalancePageState extends State<MyBalancePage>
                 ),
               ),
               onPressed: () {
-                // Handle Pay Button logic
-                AlertService.info(context, "Pay button clicked!");
+                _showPaymentDialog(context, balanceController.totalUnPaid.value);
               },
               child: const Text(
                 "Pay",
@@ -158,6 +159,58 @@ class _MyBalancePageState extends State<MyBalancePage>
           ),
         ],
       ),
+    );
+  }
+
+  void _showPaymentDialog(BuildContext context, double defaultAmount) {
+    final TextEditingController amountController = TextEditingController(
+      text: defaultAmount > 0 ? defaultAmount.toString() : '',
+    );
+    final PaymentController paymentController = Get.put(PaymentController());
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Make a Payment"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Enter the amount you wish to pay:"),
+              const SizedBox(height: 10),
+              TextField(
+                controller: amountController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Amount",
+                  prefixText: "EGP ",
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+              onPressed: () {
+                final amountText = amountController.text;
+                final amount = double.tryParse(amountText);
+                if (amount != null && amount > 0) {
+                  Navigator.pop(context); // close dialog
+                  paymentController.initiateCheckout(context, amount);
+                } else {
+                  Get.snackbar("Invalid Amount", "Please enter a valid amount to pay.", backgroundColor: Colors.red, colorText: Colors.white);
+                }
+              },
+              child: const Text("Pay Now", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

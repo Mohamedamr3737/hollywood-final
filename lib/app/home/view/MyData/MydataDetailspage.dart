@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../controller/MyDataController.dart';
+import '../../../../general/consts/consts.dart';
 
 class InBodyDetailPage extends StatefulWidget {
   // Accept categoryId so this page can be used for any category.
@@ -71,7 +72,7 @@ class _InBodyDetailPageState extends State<InBodyDetailPage> {
                       width: double.infinity,
                       height: 150,
                       child: Image.network(
-                        'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                        fit: BoxFit.cover,
+                        AppAssets.placeholderImageUrl,                        fit: BoxFit.cover,
                         // Show a spinner while loading the background image
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;

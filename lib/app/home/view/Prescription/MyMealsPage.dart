@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../controller/diet_controller.dart';
 import 'package:s_medi/general/services/alert_service.dart';
+import '../../../../general/consts/consts.dart';
 
 class MyMealsPage extends StatefulWidget {
   final int dayNum;   // The selected day (e.g. 1, 2, 3, etc.)
@@ -110,7 +111,7 @@ class _MyMealsPageState extends State<MyMealsPage> with SingleTickerProviderStat
                 height: 150,
                 width: double.infinity,
                 child: Image.network(
-                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),

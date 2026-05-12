@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_medi/app/home/view/Appointments/AppointmentsPage.dart';
@@ -10,8 +13,12 @@ import 'Sessions/MySessionsPage.dart';
 import 'package:s_medi/app/home/view/MyData/mydata.dart';
 import 'package:s_medi/app/home/view/MyRequests/SelectCategoryRequestPage.dart';
 import 'Notifications/NotificationsPage.dart';
+import 'package:s_medi/app/home/view/Shop/ShopView.dart';
 import '../controller/notifications_controller.dart';
+import '../controller/home_ads_controller.dart';
 import '../../auth/controller/token_controller.dart';
+import '../../../general/consts/consts.dart';
+import 'package:s_medi/serv/ServicesPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,12 +29,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final NotificationsController _notificationsController = Get.find<NotificationsController>();
+  final HomeAdsController _adsController = Get.put(HomeAdsController());
   late AnimationController _shineController;
   late Animation<double> _shineAnimation;
+  late final PageController _bannerPageController;
+  Timer? _bannerTimer;
+  int _currentBannerIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _bannerPageController = PageController();
     // Initialize shine animation with increased duration
     _shineController = AnimationController(
       duration: const Duration(seconds: 6), // Increased from 3 to 6 seconds
@@ -42,10 +54,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     // Fetch the initial unread count
     checkLoginAndFetchNotifications();
+    _adsController.fetchAds().then((_) => _startBannerAutoScroll());
+
   }
 
   @override
   void dispose() {
+    _bannerTimer?.cancel();
+    _bannerPageController.dispose();
     _shineController.dispose();
     super.dispose();
   }
@@ -56,6 +72,44 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  void _startBannerAutoScroll() {
+    _bannerTimer?.cancel();
+    _bannerTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!_bannerPageController.hasClients || _adsController.ads.isEmpty) return;
+      final nextPage = (_currentBannerIndex + 1) % _adsController.ads.length;
+      _bannerPageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _handleBannerTap(HomeAd ad) {
+    Widget destination;
+    switch (ad.type.toLowerCase()) {
+      case 'product':
+        destination = const ProductsPage();
+        break;
+      case 'offer':
+        destination = const SpecialOffersPage();
+        break;
+      case 'page':
+        destination = const ServicesPage();
+        break;
+      default:
+        destination = const SpecialOffersPage();
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => destination),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -64,94 +118,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       body: Column(
         children: [
-          Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: [
-              // Upper background image
-              Image.network(
-                'https://t3.ftcdn.net/jpg/03/66/08/34/360_F_366083470_jTuk7ZhaXxlk3paaPIxxPv2jUQhe1tQb.jpg',
-                height: screenHeight * 0.25,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              // Circle profile icon
-              Positioned(
-                bottom: -screenHeight * 0.06,
-                child: Container(
-                  width: screenWidth * 0.35,
-                  height: screenWidth * 0.35,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    image: const DecorationImage(
-                      image: NetworkImage(
-                          'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg'),
-                      fit: BoxFit.cover,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Notifications Icon with reactive badge
-              Positioned(
-                top: 50,
-                right: 16,
-                child: Obx(() {
-                  int count = _notificationsController.unreadCount.value;
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.notifications,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const NotificationsPage()),
-                          );
-                        },
-                      ),
-                      if (count > 0)
-                        Positioned(
-                          right: 0,
-                          top: -2,
-                          child: Container(
-                            padding: const EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 18,
-                              minHeight: 18,
-                            ),
-                            child: Text(
-                              count.toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                }),
-              ),
-            ],
-          ),
-          SizedBox(height: screenHeight * 0.08),
+          _buildHeaderSection(screenWidth, screenHeight),
           // Grid of clickable options
           Expanded(
             child: GridView.count(
@@ -229,6 +196,285 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
     );
+  }
+
+  Widget _buildHeaderSection(double screenWidth, double screenHeight) {
+    return Container(
+      height: screenHeight * 0.32,
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(40),
+          bottomRight: Radius.circular(40),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(40),
+          bottomRight: Radius.circular(40),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: _buildBannerCarousel(screenHeight),
+            ),
+            Positioned(
+              top: 50,
+              right: 16,
+              child: Obx(() {
+                int count = _notificationsController.unreadCount.value;
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.3),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white.withOpacity(0.2)),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.notifications_outlined,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                          );
+                        },
+                      ),
+                    ),
+                    if (count > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          child: Text(
+                            count.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget _buildBannerCarousel(double screenHeight) {
+    return Obx(() {
+      if (_adsController.isLoading.value) {
+        return _buildBannerPlaceholder(screenHeight);
+      }
+
+      if (_adsController.ads.isEmpty) {
+        if (_adsController.errorMessage.isNotEmpty) {
+          return _buildBannerError(screenHeight, _adsController.errorMessage.value);
+        }
+        return SizedBox(
+          height: screenHeight * 0.25,
+          width: double.infinity,
+          child: Image.network(
+            AppAssets.placeholderImageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey.shade200,
+                child: const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+              );
+            },
+          ),
+        );
+      }
+
+      return GestureDetector(
+        onTap: () => _handleBannerTap(_adsController.ads[_currentBannerIndex]),
+        child: SizedBox(
+          height: screenHeight * 0.25,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Animated PageView for images
+              PageView.builder(
+                controller: _bannerPageController,
+                itemCount: _adsController.ads.length,
+                physics: const ClampingScrollPhysics(),
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentBannerIndex = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  final ad = _adsController.ads[index];
+                  return SizedBox(
+                    width: double.infinity,
+                    child: Image.network(
+                      ad.imageUrl.isNotEmpty ? ad.imageUrl : AppAssets.placeholderImageUrl,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+              // Gradient overlay for better text readability
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.05),
+                      Colors.black.withOpacity(0.6),
+                    ],
+                    stops: const [0.5, 1.0],
+                  ),
+                ),
+              ),
+              // Ad name text in a modern glassmorphism pill
+              Positioned(
+                bottom: 40,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          _adsController.ads[_currentBannerIndex].name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Centered dots indicator at the bottom
+              Positioned(
+                bottom: 15,
+                left: 0,
+                right: 0,
+                child: _buildBannerIndicators(),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildBannerPlaceholder(double screenHeight) {
+    return Container(
+      height: screenHeight * 0.25,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.grey.shade200,
+            Colors.grey.shade100,
+          ],
+        ),
+      ),
+      child: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget _buildBannerError(double screenHeight, String message) {
+    return Container(
+      height: screenHeight * 0.25,
+      width: double.infinity,
+      color: Colors.grey.shade100,
+      child: Center(
+        child: Text(
+          message,
+          style: const TextStyle(color: Colors.black54),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBannerIndicators() {
+    return Obx(() {
+      final total = _adsController.ads.length;
+      if (total <= 1) return const SizedBox.shrink();
+
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(total, (index) {
+          final isActive = _currentBannerIndex == index;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            height: 8,
+            width: isActive ? 26 : 8,
+            decoration: BoxDecoration(
+              color: isActive ? Colors.white : Colors.white.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(20),
+            ),
+          );
+        }),
+      );
+    });
   }
 
   // Build each icon option with realistic glass effect and circular animated shine

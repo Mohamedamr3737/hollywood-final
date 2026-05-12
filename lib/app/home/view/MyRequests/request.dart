@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../controller/requests_controller.dart'; // <-- Import your controller
 import 'AddTicketPageRequest.dart';
 import 'TicketDetailsPageRequest.dart';
+import '../../../../general/consts/consts.dart';
 
 class MyRequestsPage extends StatefulWidget {
   final int category; // e.g. "Ask Doctor", "Sessions", etc.
@@ -307,7 +308,7 @@ class _MyRequestsPageState extends State<MyRequestsPage>
                 height: 150,
                 width: double.infinity,
                 child: Image.network(
-                  'https://t3.ftcdn.net/jpg/03/66/08/34/360_F_366083470_jTuk7ZhaXxlk3paaPIxxPv2jUQhe1tQb.jpg',                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),

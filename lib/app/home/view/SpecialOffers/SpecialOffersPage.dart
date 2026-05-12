@@ -6,6 +6,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:get/get.dart';
 import '../../controller/SpecialOffersController.dart';
 import '../../../auth/controller/token_controller.dart';
+import '../../../../general/consts/consts.dart';
 
 class SpecialOffersPage extends StatefulWidget {
   const SpecialOffersPage({super.key});
@@ -45,7 +46,7 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                       decoration: const BoxDecoration(
                         image: DecorationImage(
                           image: NetworkImage(
-                            'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
+                            AppAssets.placeholderImageUrl,
                           ),
                           fit: BoxFit.cover,
                         ),
@@ -89,7 +90,8 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                     backgroundColor: Colors.black.withOpacity(0.7),
                     elevation: 0,
                     leading: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.orangeAccent),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -186,7 +188,7 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
             );
           } else if (snapshot.hasData) {
             final offers = snapshot.data!;
-            
+
             // Check if offers list is empty
             if (offers.isEmpty) {
               return Stack(
@@ -199,7 +201,7 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                         decoration: const BoxDecoration(
                           image: DecorationImage(
                             image: NetworkImage(
-                              'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
+                              AppAssets.placeholderImageUrl,
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -243,7 +245,8 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                       backgroundColor: Colors.black.withOpacity(0.7),
                       elevation: 0,
                       leading: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                        icon: const Icon(Icons.arrow_back,
+                            color: Colors.orangeAccent),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -339,7 +342,7 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                 ],
               );
             }
-            
+
             // If offers exist, show the normal layout
             return Stack(
               children: [
@@ -351,7 +354,7 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                       decoration: const BoxDecoration(
                         image: DecorationImage(
                           image: NetworkImage(
-                            'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
+                            AppAssets.placeholderImageUrl,
                           ),
                           fit: BoxFit.cover,
                         ),
@@ -395,7 +398,8 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                     backgroundColor: Colors.black.withOpacity(0.7),
                     elevation: 0,
                     leading: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.orangeAccent),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -421,11 +425,17 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                         const SizedBox(height: 80),
 
                         const SizedBox(height: 20),
-                        // Build a list of OfferCards from the fetched data
                         for (var offer in offers)
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: OfferCard(offer: offer),
+                            child: OfferCard(
+                              offer: offer,
+                              onRefresh: () {
+                                setState(() {
+                                  _futureOffers = _controller.fetchOffers();
+                                });
+                              },
+                            ),
                           ),
                       ],
                     ),
@@ -444,215 +454,239 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
 
 class OfferCard extends StatelessWidget {
   final Offer offer;
-  const OfferCard({required this.offer});
+  final VoidCallback onRefresh;
+  
+  const OfferCard({required this.offer, required this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 15,
-            spreadRadius: 0,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 25,
-            spreadRadius: 0,
-            offset: const Offset(0, 15),
-          ),
-        ],
-      ),
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                Colors.grey[50]!,
-              ],
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              spreadRadius: 0,
+              offset: const Offset(0, 8),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image section
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      offer.image,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[200],
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey,
-                            size: 40,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Content section
-                Expanded(
-                  child: Column(
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 25,
+              spreadRadius: 0,
+              offset: const Offset(0, 15),
+            ),
+          ],
+        ),
+        child: Card(
+          elevation: 0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white,
+                  Colors.grey[50]!,
+                ],
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title
-                      Text(
-                        offer.title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          height: 1.3,
+                      // Image section
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.network(
+                            offer.image,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.image_not_supported,
+                                  color: Colors.grey,
+                                  size: 40,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      // Short description
-                      if (offer.shortDescription.isNotEmpty)
-                        Text(
-                          offer.shortDescription,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                            height: 1.4,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      const SizedBox(height: 12),
-                      // Status and button row
-                      Row(
-                        children: [
-                          // Offer Status
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: offer.registered ? Colors.green[100] : Colors.orange[100],
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: offer.registered ? Colors.green : Colors.orange,
-                                width: 1,
+                      const SizedBox(width: 16),
+                      // Content section
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Title
+                            Text(
+                              offer.title,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                height: 1.3,
                               ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  offer.registered ? Icons.check_circle : Icons.local_offer,
-                                  color: offer.registered ? Colors.green[700] : Colors.orange[700],
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  offer.registered ? "Registered" : "Available",
-                                  style: TextStyle(
-                                    color: offer.registered ? Colors.green[700] : Colors.orange[700],
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Spacer(),
-                          // "Read More" button
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.black,
-                                  Colors.grey[800]!,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Get.to(() => OfferDetailPage(offer: offer));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              ),
-                              child: const Text(
-                                'Read More',
+                            const SizedBox(height: 6),
+                            // Short description
+                            if (offer.shortDescription.isNotEmpty)
+                              Text(
+                                offer.shortDescription,
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                  height: 1.4,
                                 ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  // Bottom row: status badge + Read More button
+                  Row(
+                    children: [
+                      // Offer Status / End At
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: offer.registered
+                              ? Colors.green[100]
+                              : Colors.orange[100],
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color:
+                                offer.registered ? Colors.green : Colors.orange,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              offer.registered
+                                  ? Icons.check_circle
+                                  : Icons.access_time,
+                              color: offer.registered
+                                  ? Colors.green[700]
+                                  : Colors.orange[700],
+                              size: 12,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              offer.registered
+                                  ? "Registered"
+                                  : (offer.endAt.isNotEmpty
+                                      ? offer.endAt
+                                      : "Available"),
+                              style: TextStyle(
+                                color: offer.registered
+                                    ? Colors.green[700]
+                                    : Colors.orange[700],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      // "Read More" button
+                      SizedBox(
+                        height: 34,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Get.to(() => OfferDetailPage(
+                                offer: offer, onRefresh: onRefresh));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                          ),
+                          child: const Text(
+                            'Read More',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
 
-class OfferDetailPage extends StatelessWidget {
+class OfferDetailPage extends StatefulWidget {
   final Offer offer;
+  final VoidCallback onRefresh;
 
-  const OfferDetailPage({Key? key, required this.offer}) : super(key: key);
+  const OfferDetailPage({Key? key, required this.offer, required this.onRefresh}) : super(key: key);
+
+  @override
+  State<OfferDetailPage> createState() => _OfferDetailPageState();
+}
+
+class _OfferDetailPageState extends State<OfferDetailPage> {
+  late bool isRegistered;
+  bool isRegistering = false;
+  final SpecialOffersController _controller = SpecialOffersController();
+
+  @override
+  void initState() {
+    super.initState();
+    isRegistered = widget.offer.registered;
+  }
 
   // Helper method to extract iframe URL from HTML
   String? extractIframeUrl(String html) {
@@ -670,24 +704,123 @@ class OfferDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Debug: Print the offer data to see what we're working with
-    print("Offer Body: ${offer.body}");
-    print("Offer Description: ${offer.shortDescription}");
-    print("Offer Registered: ${offer.registered}");
-    
+    print("Offer Body: ${widget.offer.body}");
+    print("Offer Description: ${widget.offer.shortDescription}");
+    print("Offer Registered: ${widget.offer.registered}");
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(offer.title),
+        title: Text(widget.offer.title),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
       ),
-      body: offer.body != null && offer.body!.isNotEmpty && isIframeOnly(offer.body!)
-          ? _buildIframeContent()
-          : _buildRegularContent(),
+      body: Column(
+        children: [
+          Expanded(
+            child: widget.offer.body != null &&
+                    widget.offer.body!.isNotEmpty &&
+                    isIframeOnly(widget.offer.body!)
+                ? _buildIframeContent()
+                : _buildRegularContent(),
+          ),
+          _buildRegisterButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRegisterButton() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: isRegistered
+          ? ElevatedButton(
+              onPressed: null,
+              style: ElevatedButton.styleFrom(
+                disabledBackgroundColor: Colors.grey[300],
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+              child: const Text(
+                "Already Registered",
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : ElevatedButton(
+              onPressed: isRegistering
+                  ? null
+                  : () async {
+                      setState(() {
+                        isRegistering = true;
+                      });
+                      final success = await _controller.registerOffer(widget.offer.id);
+                      setState(() {
+                        isRegistering = false;
+                        if (success) {
+                          isRegistered = true;
+                          widget.onRefresh();
+                          Get.snackbar(
+                            "Success",
+                            "You have successfully registered for this offer!",
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                          );
+                        } else {
+                          Get.snackbar(
+                            "Error",
+                            _controller.errorMessage,
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                          );
+                        }
+                      });
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+              child: isRegistering
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      "Register Now",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+            ),
     );
   }
 
   Widget _buildIframeContent() {
-    final iframeUrl = extractIframeUrl(offer.body!);
+    final iframeUrl = extractIframeUrl(widget.offer.body!);
     if (iframeUrl == null) {
       return const Center(
         child: Text("Unable to load offer content"),
@@ -724,11 +857,11 @@ class OfferDetailPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Main Image
-          if (offer.image.isNotEmpty)
+          if (widget.offer.image.isNotEmpty)
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                offer.image,
+                widget.offer.image,
                 width: double.infinity,
                 height: 250,
                 fit: BoxFit.cover,
@@ -745,7 +878,8 @@ class OfferDetailPage extends StatelessWidget {
                     height: 250,
                     color: Colors.grey[200],
                     child: const Center(
-                      child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                      child: Icon(Icons.image_not_supported,
+                          size: 50, color: Colors.grey),
                     ),
                   );
                 },
@@ -755,7 +889,7 @@ class OfferDetailPage extends StatelessWidget {
 
           // Title
           Text(
-            offer.title,
+            widget.offer.title,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
@@ -764,10 +898,10 @@ class OfferDetailPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: offer.registered ? Colors.green[100] : Colors.orange[100],
+              color: isRegistered ? Colors.green[100] : Colors.orange[100],
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: offer.registered ? Colors.green : Colors.orange,
+                color: isRegistered ? Colors.green : Colors.orange,
                 width: 1,
               ),
             ),
@@ -775,15 +909,18 @@ class OfferDetailPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  offer.registered ? Icons.check_circle : Icons.local_offer,
-                  color: offer.registered ? Colors.green[700] : Colors.orange[700],
+                  isRegistered ? Icons.check_circle : Icons.local_offer,
+                  color:
+                      isRegistered ? Colors.green[700] : Colors.orange[700],
                   size: 16,
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  offer.registered ? "Registered" : "Available",
+                  isRegistered ? "Registered" : "Available",
                   style: TextStyle(
-                    color: offer.registered ? Colors.green[700] : Colors.orange[700],
+                    color: isRegistered
+                        ? Colors.green[700]
+                        : Colors.orange[700],
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),
@@ -794,7 +931,7 @@ class OfferDetailPage extends StatelessWidget {
           const SizedBox(height: 16),
 
           // HTML Content Section
-          if (offer.body != null && offer.body!.isNotEmpty)
+          if (widget.offer.body != null && widget.offer.body!.isNotEmpty)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -804,7 +941,7 @@ class OfferDetailPage extends StatelessWidget {
                 border: Border.all(color: Colors.grey[300]!),
               ),
               child: Html(
-                data: offer.body!,
+                data: widget.offer.body!,
                 style: {
                   "body": Style(
                     fontSize: FontSize(16),

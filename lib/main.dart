@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:get/get.dart';
 import './app/auth/controller/token_controller.dart';
 import 'package:s_medi/general/consts/consts.dart';
 import 'app/auth/view/login_page.dart';
 import 'app/home/view/home.dart';
 import 'app/home/controller/profile_controller.dart';
 import 'app/home/controller/notifications_controller.dart';
+
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase if needed.
@@ -16,7 +15,6 @@ void main() async {
 
   Get.put(NotificationsController());
   runApp(
-
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProfileController()),
@@ -37,14 +35,15 @@ class _MyAppState extends State<MyApp> {
   var isLogin = false;
 
   checkIfLogin() async {
-      if (await getAccessToken()!=null) {
-        setState(() {
-          isLogin = true;
-        });
-      }else {
-        setState(() {
-          isLogin = false;
-        });      }
+    if (await getAccessToken() != null) {
+      setState(() {
+        isLogin = true;
+      });
+    } else {
+      setState(() {
+        isLogin = false;
+      });
+    }
   }
 
   @override

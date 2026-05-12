@@ -27,7 +27,8 @@ class _ProductsPageState extends State<ProductsPage> {
   void initState() {
     super.initState();
     checkLoginStatus();
-    shopController.fetchProducts(page: 1);
+    Future.microtask(() => shopController.fetchProducts(page: 1));
+
     shopController.fetchCategories();
   }
 

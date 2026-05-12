@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../controller/orders_controller.dart';
 import 'OrderDetailsPage.dart';
 import '../../../auth/controller/token_controller.dart';
+import '../../../../general/consts/consts.dart';
 
 class MyOrdersPage extends StatefulWidget {
   const MyOrdersPage({Key? key}) : super(key: key);
@@ -38,7 +39,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: NetworkImage(
-                      'https://t3.ftcdn.net/jpg/03/66/08/34/360_F_366083470_jTuk7ZhaXxlk3paaPIxxPv2jUQhe1tQb.jpg',
+                      AppAssets.placeholderImageUrl,
                     ),
                     fit: BoxFit.cover,
                   ),

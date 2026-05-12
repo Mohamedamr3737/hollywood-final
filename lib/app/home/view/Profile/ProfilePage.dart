@@ -295,7 +295,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: NetworkImage(
-                      'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',
+                      AppAssets.placeholderImageUrl,
                     ),
                     fit: BoxFit.cover,
                   ),

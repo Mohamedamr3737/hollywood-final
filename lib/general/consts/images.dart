@@ -12,4 +12,8 @@ class AppAssets {
       imgSignup = "assets/images/img_signup.png",
       imgDoctor = "assets/images/doctor.jpg",
       imgWelcome = "assets/images/img_welcome.png";
+  
+  // Placeholder image URL - change this to update all placeholder images at once
+  // TODO: Replace with your actual mockapi.io endpoint when ready
+  static const String placeholderImageUrl = 'https://t3.ftcdn.net/jpg/03/66/08/34/360_F_366083470_jTuk7ZhaXxlk3paaPIxxPv2jUQhe1tQb.jpg';
 }

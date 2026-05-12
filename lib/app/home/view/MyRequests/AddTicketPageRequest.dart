@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../controller/requests_controller.dart';
 import 'package:s_medi/general/services/alert_service.dart';
+import '../../../../general/consts/consts.dart';
 
 class AddTicketPage extends StatefulWidget {
   final int category;
@@ -113,7 +114,7 @@ class _AddTicketPageState extends State<AddTicketPage> {
                 width: double.infinity,
                 height: 150,
                 child: Image.network(
-                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),

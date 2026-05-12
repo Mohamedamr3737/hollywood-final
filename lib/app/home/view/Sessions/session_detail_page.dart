@@ -490,7 +490,7 @@ class _SessionDetailPageState extends State<SessionDetailPage> {
             clipBehavior: Clip.none,
             children: [
               Image.network(
-                'https://t3.ftcdn.net/jpg/03/66/08/34/360_F_366083470_jTuk7ZhaXxlk3paaPIxxPv2jUQhe1tQb.jpg',
+                AppAssets.placeholderImageUrl,
                 height: MediaQuery.of(context).size.height * 0.25,
                 width: double.infinity,
                 fit: BoxFit.cover,

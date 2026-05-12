@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:get/get.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:s_medi/general/consts/consts.dart';
@@ -33,14 +31,16 @@ class ServiceDetailPage extends StatelessWidget {
     print("Service Body: ${service.body}");
     print("Service Details: ${service.details}");
     print("Service Description: ${service.description}");
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(service.title),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
       ),
-      body: service.body != null && service.body!.isNotEmpty && isIframeOnly(service.body!)
+      body: service.body != null &&
+              service.body!.isNotEmpty &&
+              isIframeOnly(service.body!)
           ? _buildIframeContent()
           : _buildRegularContent(),
     );
@@ -105,7 +105,8 @@ class ServiceDetailPage extends StatelessWidget {
                     height: 250,
                     color: Colors.grey[200],
                     child: const Center(
-                      child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                      child: Icon(Icons.image_not_supported,
+                          size: 50, color: Colors.grey),
                     ),
                   );
                 },
@@ -204,6 +205,7 @@ class ServiceDetailPage extends StatelessWidget {
     );
   }
 }
+
 /// Model class for each service item.
 class Service {
   final String title;
@@ -226,7 +228,7 @@ class Service {
   factory Service.fromJson(Map<String, dynamic> json) {
     // Debug: Print the raw JSON to see what fields are available
     print("Raw Service JSON: $json");
-    
+
     // Try different possible field names for the body/content
     String bodyContent = "";
     if (json["body"] != null) {
@@ -238,10 +240,13 @@ class Service {
     } else if (json["details"] != null) {
       bodyContent = json["details"].toString();
     }
-    
+
     return Service(
       title: json["title"] ?? json["name"] ?? "Untitled Service",
-      description: json["short_description"] ?? json["summary"] ?? json["description"] ?? "",
+      description: json["short_description"] ??
+          json["summary"] ??
+          json["description"] ??
+          "",
       imagePath: json["image"] ?? json["image_url"] ?? json["photo"] ?? "",
       details: json["details"] ?? json["short_description"] ?? "",
       detailImages: [],
@@ -277,7 +282,9 @@ class _ServicesPageState extends State<ServicesPage> {
         if (data["status"] == true) {
           // data["data"] should be a list of service items
           final List<dynamic> rawServices = data["data"];
-          services = rawServices.map((jsonItem) => Service.fromJson(jsonItem)).toList();
+          services = rawServices
+              .map((jsonItem) => Service.fromJson(jsonItem))
+              .toList();
           errorMessage = '';
         } else {
           errorMessage = data["message"] ?? "Failed to fetch services.";
@@ -317,31 +324,31 @@ class _ServicesPageState extends State<ServicesPage> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty
-          ? Center(child: Text(errorMessage))
-          : ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            "Our Features & Services",
-            style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          // Build a list of ServiceCards from the fetched data
-          for (var service in services)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ServiceCard(service: service),
-            ),
-        ],
-      ),
+              ? Center(child: Text(errorMessage))
+              : ListView(
+                  padding: const EdgeInsets.all(16.0),
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Our Features & Services",
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    // Build a list of ServiceCards from the fetched data
+                    for (var service in services)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ServiceCard(service: service),
+                      ),
+                  ],
+                ),
     );
   }
 }
@@ -405,7 +412,8 @@ class ServiceCard extends StatelessWidget {
                 // Pass the entire service object to detail page
                 Get.to(() => ServiceDetailPage(service: service));
               },
-              child: const Text('Read More', style: TextStyle(color: Colors.white)),
+              child: const Text('Read More',
+                  style: TextStyle(color: Colors.white)),
             ),
           ],
         ),

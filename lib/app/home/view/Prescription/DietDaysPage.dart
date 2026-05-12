@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'MyMealsPage.dart';
 import '../../controller/diet_controller.dart';
+import '../../../../general/consts/consts.dart';
 
 class DietDaysPage extends StatefulWidget {
   // Note: We use Map<String, dynamic> to include 'id' as an int
@@ -38,7 +39,7 @@ class _DietDaysPageState extends State<DietDaysPage> {
                 height: 150,
                 width: double.infinity,
                 child: Image.network(
-                  'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRElHzS7DF6u04X-Y0OPLE2YkIIcaI6XjbB5K5atLN_ZCPg_Un9',                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),
