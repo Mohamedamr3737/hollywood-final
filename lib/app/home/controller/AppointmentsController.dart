@@ -6,8 +6,7 @@ import '../../../general/consts/consts.dart';
 import '../../../general/services/alert_service.dart';
 
 class AppointmentsController extends GetxController {
-  final String apiUrl =
-      "${ApiConfig.baseUrl}/api/patient/appointments";
+  final String apiUrl = "${ApiConfig.baseUrl}/api/patient/appointments";
 
   var isLoading = false.obs;
   var errorMessage = ''.obs;
@@ -70,7 +69,6 @@ class AppointmentsController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = "Something went wrong!";
-      print("Exception in fetchSettings: $e");
     } finally {
       isLoading(false);
     }
@@ -93,8 +91,7 @@ class AppointmentsController extends GetxController {
       isLoading(true);
       var bearerToken = await getAccessToken();
       final formattedDate = date.replaceAll('-', '/');
-      final url =
-          "${ApiConfig.baseUrl}/api/patient/appointments/store";
+      final url = "${ApiConfig.baseUrl}/api/patient/appointments/store";
       final body = json.encode({
         "date": formattedDate,
         "time": time,
@@ -112,9 +109,6 @@ class AppointmentsController extends GetxController {
         body: body,
       );
 
-      print("helloooo");
-      print("Response body: ${response.body}");
-
       final jsonData = json.decode(response.body);
 
       if (response.statusCode == 200 && jsonData["status"] == true) {
@@ -123,22 +117,22 @@ class AppointmentsController extends GetxController {
         if (jsonData["message"] is Map) {
           var firstKey = (jsonData["message"] as Map).keys.first;
           var errors = jsonData["message"][firstKey];
-          errorMessage.value =
-          errors is List && errors.isNotEmpty ? errors[0] : "Failed to store appointment";
+          errorMessage.value = errors is List && errors.isNotEmpty
+              ? errors[0]
+              : "Failed to store appointment";
         } else {
-          errorMessage.value = jsonData["message"] ?? "Failed to store appointment";
+          errorMessage.value =
+              jsonData["message"] ?? "Failed to store appointment";
         }
         return false;
       }
     } catch (e) {
       errorMessage.value = e.toString();
-      print("Exception in storeAppointment: $e");
       return false;
     } finally {
       isLoading(false);
     }
   }
-
 
   /// Cancel an appointment using the API.
   /// Sends the appointment ID in the request body.

@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 class MedicationController {
   Future<List<dynamic>> fetchMyPrescriptions() async {

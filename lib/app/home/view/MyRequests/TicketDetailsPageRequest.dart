@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../controller/requests_controller.dart';
 import 'AddCommentPageRequest.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 import '../../../../general/consts/consts.dart';
 
 class TicketDetailsPage extends StatefulWidget {
@@ -72,7 +72,6 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
 
       // Optionally pop back with updated data
       Navigator.of(context).pop(_request);
-
     } catch (e) {
       setState(() {
         _closeErrorMessage = e.toString();
@@ -103,7 +102,8 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                 width: double.infinity,
                 height: 150,
                 child: Image.network(
-                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,
+                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),
@@ -111,30 +111,29 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
           ),
           // (B) Lotus circle icon
           Positioned(
-            top: 110,
-            left: MediaQuery.of(context).size.width / 2 - 70,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+              top: 110,
+              left: MediaQuery.of(context).size.width / 2 - 70,
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
+                    ),
+                    fit: BoxFit.cover,
                   ),
-                ],
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
-                  ),
-                  fit: BoxFit.cover,
                 ),
-              ),
-            )
-          ),
+              )),
           // (C) Custom AppBar
           Positioned(
             top: 0,
@@ -167,18 +166,23 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Title
-                  const Text("Title", style: TextStyle(fontSize: 14, color: Colors.black54)),
-                  Text(subject, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text("Title",
+                      style: TextStyle(fontSize: 14, color: Colors.black54)),
+                  Text(subject,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
 
                   // Details
-                  const Text("Details", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                  const Text("Details",
+                      style: TextStyle(fontSize: 14, color: Colors.black54)),
                   Text(description, style: const TextStyle(fontSize: 16)),
                   const SizedBox(height: 8),
 
                   // Files (if any)
                   if (files.isNotEmpty) ...[
-                    const Text("Files", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                    const Text("Files",
+                        style: TextStyle(fontSize: 14, color: Colors.black54)),
                     const SizedBox(height: 4),
                     ...files.map((f) {
                       final link = f['link']?.toString() ?? '';
@@ -188,13 +192,19 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                   ],
 
                   // Date
-                  const Text("Date", style: TextStyle(fontSize: 14, color: Colors.black54)),
-                  Text(createdAt, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text("Date",
+                      style: TextStyle(fontSize: 14, color: Colors.black54)),
+                  Text(createdAt,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
 
                   // Status
-                  const Text("Status", style: TextStyle(fontSize: 14, color: Colors.black54)),
-                  Text(status, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text("Status",
+                      style: TextStyle(fontSize: 14, color: Colors.black54)),
+                  Text(status,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
 
                   // Potential error from closing the ticket
                   if (_closeErrorMessage != null) ...[
@@ -210,56 +220,64 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                   // Comments
                   const Text(
                     "Comments",
-                    style: TextStyle(fontSize: 18, color: Colors.orangeAccent, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.orangeAccent,
+                        fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   comments.isEmpty
                       ? const Text(
-                    "No Comments!",
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                  )
+                          "No Comments!",
+                          style: TextStyle(fontSize: 16, color: Colors.black54),
+                        )
                       : Expanded(
-                    child: ListView.builder(
-                      itemCount: comments.length,
-                      itemBuilder: (ctx, idx) {
-                        final c = comments[idx] as Map<String, dynamic>;
-                        final commentText = c['comment'] ?? '';
-                        final commentFiles = c['files'] as List<dynamic>? ?? [];
-                        final commentBy = c['by'] ?? '';
-                        final commentDate = c['created_at'] ?? '';
+                          child: ListView.builder(
+                            itemCount: comments.length,
+                            itemBuilder: (ctx, idx) {
+                              final c = comments[idx] as Map<String, dynamic>;
+                              final commentText = c['comment'] ?? '';
+                              final commentFiles =
+                                  c['files'] as List<dynamic>? ?? [];
+                              final commentBy = c['by'] ?? '';
+                              final commentDate = c['created_at'] ?? '';
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(commentText, style: const TextStyle(fontSize: 16)),
-                              if (commentFiles.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: commentFiles.map((cf) {
-                                    final fileLink = cf['link']?.toString() ?? '';
-                                    return SizedBox(
-                                      width: 120,
-                                      child: FileItem(fileLink: fileLink),
-                                    );
-                                  }).toList(),
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(commentText,
+                                        style: const TextStyle(fontSize: 16)),
+                                    if (commentFiles.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: commentFiles.map((cf) {
+                                          final fileLink =
+                                              cf['link']?.toString() ?? '';
+                                          return SizedBox(
+                                            width: 120,
+                                            child: FileItem(fileLink: fileLink),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "By: $commentBy on $commentDate",
+                                      style: const TextStyle(
+                                          fontSize: 14, color: Colors.black54),
+                                    ),
+                                    const Divider(),
+                                  ],
                                 ),
-                              ],
-                              const SizedBox(height: 4),
-                              Text(
-                                "By: $commentBy on $commentDate",
-                                style: const TextStyle(fontSize: 14, color: Colors.black54),
-                              ),
-                              const Divider(),
-                            ],
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
-                  ),
+                        ),
                 ],
               ),
             ),
@@ -286,7 +304,8 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                       onPressed: _goToAddComment,
                       child: const Text(
                         "New comment",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -304,17 +323,19 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                       onPressed: _isClosing ? null : _closeTicket,
                       child: _isClosing
                           ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
                           : const Text(
-                        "Close Ticket",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
+                              "Close Ticket",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
                     ),
                   ),
                 ],
@@ -337,8 +358,7 @@ class FileItem extends StatelessWidget {
     final uri = Uri.parse(fileLink);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-    }
+    } else {}
   }
 
   @override

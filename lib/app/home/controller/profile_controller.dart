@@ -6,8 +6,9 @@ import 'package:get/get.dart';
 import '../../auth/controller/token_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../auth/view/login_page.dart';
-import 'package:s_medi/general/consts/consts.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
+
 class ProfileController with ChangeNotifier {
   String apiUrl = "${ApiConfig.baseUrl}/api/patient/profile/me";
   String updateApiUrl = "${ApiConfig.baseUrl}/api/patient/profile/update";
@@ -44,7 +45,9 @@ class ProfileController with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateProfile(Map<String, dynamic> updatedData, BuildContext context, {File? imageFile}) async {
+  Future<void> updateProfile(
+      Map<String, dynamic> updatedData, BuildContext context,
+      {File? imageFile}) async {
     try {
       String? token = await getAccessToken();
 
@@ -66,13 +69,16 @@ class ProfileController with ChangeNotifier {
         request.fields['phone'] = updatedData["phone"];
 
         // Add password fields if provided
-        if (updatedData.containsKey("password") && updatedData["password"].isNotEmpty) {
+        if (updatedData.containsKey("password") &&
+            updatedData["password"].isNotEmpty) {
           request.fields['password'] = updatedData["password"];
-          request.fields['password_confirmation'] = updatedData["password_confirmation"];
+          request.fields['password_confirmation'] =
+              updatedData["password_confirmation"];
         }
 
         // Add image file
-        request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+        request.files
+            .add(await http.MultipartFile.fromPath('image', imageFile.path));
 
         var streamedResponse = await request.send();
         var response = await http.Response.fromStream(streamedResponse);
@@ -86,7 +92,8 @@ class ProfileController with ChangeNotifier {
           if (responseData["message"] is Map) {
             errorMessage = responseData["message"].values.join("\n");
           } else {
-            errorMessage = responseData["message"] ?? "Failed to update profile.";
+            errorMessage =
+                responseData["message"] ?? "Failed to update profile.";
           }
           AlertService.error(context, errorMessage);
         }
@@ -101,9 +108,11 @@ class ProfileController with ChangeNotifier {
           "phone": updatedData["phone"],
         };
 
-        if (updatedData.containsKey("password") && updatedData["password"].isNotEmpty) {
+        if (updatedData.containsKey("password") &&
+            updatedData["password"].isNotEmpty) {
           finalData["password"] = updatedData["password"];
-          finalData["password_confirmation"] = updatedData["password_confirmation"];
+          finalData["password_confirmation"] =
+              updatedData["password_confirmation"];
         }
 
         final response = await http.post(
@@ -126,7 +135,8 @@ class ProfileController with ChangeNotifier {
           if (responseData["message"] is Map) {
             errorMessage = responseData["message"].values.join("\n");
           } else {
-            errorMessage = responseData["message"] ?? "Failed to update profile.";
+            errorMessage =
+                responseData["message"] ?? "Failed to update profile.";
           }
           AlertService.error(context, errorMessage);
         }
@@ -168,7 +178,6 @@ class ProfileController with ChangeNotifier {
         AlertService.success(context, "Signed out successfully");
 
         Get.offAll(() => const LoginView());
-
       } else {
         AlertService.error(context, "Sign out failed: ${response.statusCode}");
       }
@@ -183,7 +192,8 @@ class ProfileController with ChangeNotifier {
       // Retrieve the current access token.
       String? token = await getAccessToken();
       if (token == null) {
-        AlertService.error(context, "No token found. You may already be signed out.");
+        AlertService.error(
+            context, "No token found. You may already be signed out.");
         return;
       }
 
@@ -209,12 +219,12 @@ class ProfileController with ChangeNotifier {
         // Navigate to login page.
         Get.offAll(() => LoginView());
       } else {
-        String errorMsg = jsonResponse["message"] ?? "Failed to delete account.";
+        String errorMsg =
+            jsonResponse["message"] ?? "Failed to delete account.";
         AlertService.error(context, errorMsg);
       }
     } catch (e) {
       AlertService.error(context, "An error occurred: $e");
     }
   }
-
 }

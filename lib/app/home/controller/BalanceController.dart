@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart'; // For refreshAccessToken()
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 class BalanceController extends GetxController {
   var isLoading = false.obs;
@@ -52,7 +52,6 @@ class BalanceController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = "Something went wrong!";
-      print("Exception in fetchPurchases: $e");
     } finally {
       isLoading(false);
     }
@@ -60,6 +59,7 @@ class BalanceController extends GetxController {
 
   var payments = <Map<String, dynamic>>[].obs;
   var paymentsTotal = 0.0.obs;
+
   /// Fetch payments from the "patient/payment/paid" API
   Future<void> fetchPayments() async {
     try {
@@ -97,7 +97,6 @@ class BalanceController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = "Something went wrong!";
-      print("Exception in fetchPayments: $e");
     } finally {
       isLoading(false);
     }
@@ -142,7 +141,8 @@ class BalanceController extends GetxController {
           totalUse.value = (data["TotalUse"] ?? 0).toDouble();
           totalUnused.value = (data["TotalUnused"] ?? 0).toDouble();
           totalUnPaid.value = (data["TotalUnPaid"] ?? 0).toDouble();
-          totalAfterDiscount.value = (data["TotalAfterDiscount"] ?? 0).toDouble();
+          totalAfterDiscount.value =
+              (data["TotalAfterDiscount"] ?? 0).toDouble();
         } else {
           errorMessage.value = jsonData["message"] ?? "Unknown error from API";
         }
@@ -151,7 +151,6 @@ class BalanceController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = "Something went wrong!";
-      print("Exception in fetchSummary: $e");
     } finally {
       isLoading(false);
     }

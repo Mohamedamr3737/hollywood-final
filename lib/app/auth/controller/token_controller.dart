@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import '../view/login_page.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 Future<void> storeTokens(String accessToken) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -20,7 +20,6 @@ Future<void> storeTokens(String accessToken) async {
   await prefs.setString('access_token', accessToken);
   // await prefs.setString('access_token_expiry', expiryTime.toIso8601String());
 }
-
 
 // Method to retrieve the access token from SharedPreferences
 Future<String?> getAccessToken() async {
@@ -37,7 +36,7 @@ void checkLoginStatus() async {
 Future<bool> checkLoginStatusBool() async {
   if (await getAccessToken() == null) {
     return false;
-  }else{
+  } else {
     return true;
   }
 }

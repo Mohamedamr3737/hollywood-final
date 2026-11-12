@@ -1,6 +1,6 @@
 import 'package:provider/provider.dart';
 import './app/auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 import 'app/auth/view/login_page.dart';
 import 'app/home/view/home.dart';
 import 'app/home/controller/profile_controller.dart';

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../controller/AppointmentsController.dart';
 import '../../../auth/controller/token_controller.dart'; // for refreshAccessToken()
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 import '../../../../general/consts/consts.dart';
 
 class AppointmentDetailPage extends StatefulWidget {
@@ -27,7 +27,8 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
   late TextEditingController _timeCtrl;
 
   // Grab the existing controller from GetX.
-  final AppointmentsController appointmentsController = Get.find<AppointmentsController>();
+  final AppointmentsController appointmentsController =
+      Get.find<AppointmentsController>();
 
   @override
   void initState() {
@@ -84,7 +85,8 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
       final success = await appointmentsController.cancelAppointment(id: id);
       if (success) {
         // Return a Map<String, String> with a guaranteed non-null 'id'.
-        AlertService.success(context, "Your Reservation time has been canceled.");
+        AlertService.success(
+            context, "Your Reservation time has been canceled.");
         Navigator.of(context).pop({
           'action': 'cancel',
           'id': widget.appointment['id'] ?? '',
@@ -96,7 +98,6 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
       AlertService.error(context, "Error: $e");
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +115,8 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                 width: double.infinity,
                 height: 200,
                 child: Image.network(
-                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,
+                  fit: BoxFit.cover,
                 ),
               ),
               // Extra space to accommodate the circular icon
@@ -123,31 +125,29 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
           ),
           // (2) Circular lotus icon
           Positioned(
-            top: 140,
-            left: MediaQuery.of(context).size.width / 2 - 70,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+              top: 140,
+              left: MediaQuery.of(context).size.width / 2 - 70,
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
+                    ),
+                    fit: BoxFit.cover,
                   ),
-                ],
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
-                  ),
-                  fit: BoxFit.cover,
                 ),
-              ),
-            )
-
-          ),
+              )),
           // (3) The main content, below the circle
           Positioned.fill(
             top: 280,
@@ -170,7 +170,8 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                 ),
                 const SizedBox(height: 16),
 
-                const Text("Doctor", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text("Doctor",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 TextFormField(
                   controller: _doctorCtrl,
@@ -182,7 +183,8 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                 ),
                 const SizedBox(height: 16),
 
-                const Text("Department", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text("Department",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 TextFormField(
                   controller: _departmentCtrl,
@@ -194,7 +196,8 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                 ),
                 const SizedBox(height: 16),
 
-                const Text("Date", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text("Date",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 TextFormField(
                   controller: _dateCtrl,
@@ -206,7 +209,8 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                 ),
                 const SizedBox(height: 16),
 
-                const Text("Time", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text("Time",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 TextFormField(
                   controller: _timeCtrl,
@@ -217,7 +221,6 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
 
                 const SizedBox(height: 16),
 
@@ -235,7 +238,8 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                     ),
                     child: const Text(
                       "Cancel Appointment",
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
                 ),

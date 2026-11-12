@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 class RequestsController {
   // GET /api/patient/my-requests/categories
@@ -33,7 +33,8 @@ class RequestsController {
   // GET /api/patient/my-requests/list?type=<typeId>
   Future<List<dynamic>> fetchMyRequests(int typeId) async {
     final bearerToken = await getAccessToken();
-    final url = "${ApiConfig.baseUrl}/api/patient/my-requests/list?type=$typeId";
+    final url =
+        "${ApiConfig.baseUrl}/api/patient/my-requests/list?type=$typeId";
 
     final response = await http.get(
       Uri.parse(url),
@@ -48,7 +49,8 @@ class RequestsController {
       // "data" is the array of requests
       return jsonData['data'] as List<dynamic>;
     } else {
-      throw Exception('Failed to load my requests (status: ${response.statusCode})');
+      throw Exception(
+          'Failed to load my requests (status: ${response.statusCode})');
     }
   }
 
@@ -122,7 +124,8 @@ class RequestsController {
         throw Exception(jsonData['message'] ?? 'Failed to close ticket');
       }
     } else {
-      throw Exception('Failed to close ticket (status: ${response.statusCode})');
+      throw Exception(
+          'Failed to close ticket (status: ${response.statusCode})');
     }
   }
 
@@ -171,7 +174,8 @@ class RequestsController {
         throw Exception(jsonData['message'] ?? 'Failed to create ticket');
       }
     } else {
-      throw Exception('Failed to create ticket (status: ${response.statusCode})');
+      throw Exception(
+          'Failed to create ticket (status: ${response.statusCode})');
     }
   }
 }

@@ -1,4 +1,4 @@
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 var iconList = [
   AppAssets.icBody,

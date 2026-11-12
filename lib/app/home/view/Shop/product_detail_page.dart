@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'cart_page.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -43,7 +43,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             child: Column(
               children: [
                 // Hero image section
-                _buildHeroImageSection(imageUrl, title, featured, hot, isNew, constraints, screenHeight),
+                _buildHeroImageSection(imageUrl, title, featured, hot, isNew,
+                    constraints, screenHeight),
 
                 // Product details content
                 Padding(
@@ -51,13 +52,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildProductInfo(title, price, oldPrice, discountPercentage, isSmallScreen),
+                      _buildProductInfo(title, price, oldPrice,
+                          discountPercentage, isSmallScreen),
                       SizedBox(height: isSmallScreen ? 24 : 32),
                       _buildProductDetails(title, isSmallScreen),
                       SizedBox(height: isSmallScreen ? 24 : 32),
                       _buildQuantitySection(isSmallScreen),
                       SizedBox(height: isSmallScreen ? 32 : 40),
-                      _buildAddToCartSection(product, canBuy, title, isSmallScreen),
+                      _buildAddToCartSection(
+                          product, canBuy, title, isSmallScreen),
                     ],
                   ),
                 ),
@@ -160,7 +163,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     });
   }
 
-  Widget _buildHeroImageSection(String imageUrl, String title, bool featured, bool hot, bool isNew, BoxConstraints constraints, double screenHeight) {
+  Widget _buildHeroImageSection(String imageUrl, String title, bool featured,
+      bool hot, bool isNew, BoxConstraints constraints, double screenHeight) {
     final isSmallScreen = constraints.maxWidth < 600;
     final imageHeight = screenHeight * (isSmallScreen ? 0.35 : 0.4);
     final imageSize = constraints.maxWidth * (isSmallScreen ? 0.8 : 0.7);
@@ -200,34 +204,35 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
                 child: imageUrl.isEmpty
                     ? Icon(
-                  Icons.image_not_supported_rounded,
-                  size: isSmallScreen ? 60 : 80,
-                  color: Colors.grey.shade400,
-                )
+                        Icons.image_not_supported_rounded,
+                        size: isSmallScreen ? 60 : 80,
+                        color: Colors.grey.shade400,
+                      )
                     : Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.image_not_supported_rounded,
-                      size: isSmallScreen ? 60 : 80,
-                      color: Colors.grey.shade400,
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                            : null,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
-                        strokeWidth: 2,
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.image_not_supported_rounded,
+                            size: isSmallScreen ? 60 : 80,
+                            color: Colors.grey.shade400,
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Colors.orange),
+                              strokeWidth: 2,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ),
           ),
@@ -286,7 +291,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget _buildProductInfo(String title, double price, double? oldPrice, double discountPercentage, bool isSmallScreen) {
+  Widget _buildProductInfo(String title, double price, double? oldPrice,
+      double discountPercentage, bool isSmallScreen) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -427,11 +433,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             children: [
               _buildQuantityButton(
                 icon: Icons.remove_rounded,
-                onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                onPressed:
+                    _quantity > 1 ? () => setState(() => _quantity--) : null,
                 isSmallScreen: isSmallScreen,
               ),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 24 : 32),
+                margin:
+                    EdgeInsets.symmetric(horizontal: isSmallScreen ? 24 : 32),
                 padding: EdgeInsets.symmetric(
                   horizontal: isSmallScreen ? 20 : 24,
                   vertical: isSmallScreen ? 12 : 16,
@@ -480,7 +488,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         shape: BoxShape.circle,
         color: Colors.white,
         border: Border.all(
-          color: onPressed != null ? Colors.orange.shade300 : Colors.grey.shade300,
+          color:
+              onPressed != null ? Colors.orange.shade300 : Colors.grey.shade300,
           width: 2,
         ),
         boxShadow: [
@@ -500,7 +509,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           child: Center(
             child: Icon(
               icon,
-              color: onPressed != null ? Colors.orange.shade700 : Colors.grey.shade400,
+              color: onPressed != null
+                  ? Colors.orange.shade700
+                  : Colors.grey.shade400,
               size: iconSize,
             ),
           ),
@@ -509,7 +520,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget _buildAddToCartSection(Map<String, dynamic> product, bool canBuy, String title, bool isSmallScreen) {
+  Widget _buildAddToCartSection(Map<String, dynamic> product, bool canBuy,
+      String title, bool isSmallScreen) {
     return Container(
       width: double.infinity,
       height: isSmallScreen ? 56 : 64,
@@ -517,28 +529,30 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         borderRadius: BorderRadius.circular(isSmallScreen ? 28 : 32),
         gradient: canBuy
             ? LinearGradient(
-          colors: [Colors.orange.shade400, Colors.orange.shade600],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        )
+                colors: [Colors.orange.shade400, Colors.orange.shade600],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
             : LinearGradient(
-          colors: [Colors.grey.shade300, Colors.grey.shade400],
-        ),
-        boxShadow: canBuy ? [
-          BoxShadow(
-            color: Colors.orange.withOpacity(0.3),
-            blurRadius: 15,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
-          ),
-        ] : [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            spreadRadius: 0,
-            offset: const Offset(0, 2),
-          ),
-        ],
+                colors: [Colors.grey.shade300, Colors.grey.shade400],
+              ),
+        boxShadow: canBuy
+            ? [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.3),
+                  blurRadius: 15,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -546,9 +560,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           borderRadius: BorderRadius.circular(isSmallScreen ? 28 : 32),
           onTap: canBuy
               ? () {
-            CartPage.addToCart(product, _quantity);
-            AlertService.success(context, "$title added to cart (x$_quantity)");
-          }
+                  CartPage.addToCart(product, _quantity);
+                  AlertService.success(
+                      context, "$title added to cart (x$_quantity)");
+                }
               : null,
           child: Center(
             child: Text(

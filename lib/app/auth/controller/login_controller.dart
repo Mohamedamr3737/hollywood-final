@@ -3,8 +3,8 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:s_medi/general/consts/consts.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 import "../../home/view/home.dart";
 import 'token_controller.dart';
 

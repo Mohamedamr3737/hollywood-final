@@ -5,14 +5,13 @@ import 'summarytabbalance.dart';
 import 'PurshaseTabBalance.dart';
 import 'paymentstabbalance.dart';
 import '../../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 import '../../../../general/consts/consts.dart';
 import '../../controller/payment_controller.dart';
 
 class MyBalancePage extends StatefulWidget {
   @override
   State<MyBalancePage> createState() => _MyBalancePageState();
-
 }
 
 class _MyBalancePageState extends State<MyBalancePage>
@@ -74,7 +73,8 @@ class _MyBalancePageState extends State<MyBalancePage>
                   backgroundColor: Colors.black.withOpacity(0.7),
                   elevation: 0,
                   leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
+                    icon: const Icon(Icons.arrow_back,
+                        color: Colors.orangeAccent),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -145,7 +145,8 @@ class _MyBalancePageState extends State<MyBalancePage>
                 ),
               ),
               onPressed: () {
-                _showPaymentDialog(context, balanceController.totalUnPaid.value);
+                _showPaymentDialog(
+                    context, balanceController.totalUnPaid.value);
               },
               child: const Text(
                 "Pay",
@@ -180,7 +181,8 @@ class _MyBalancePageState extends State<MyBalancePage>
               const SizedBox(height: 10),
               TextField(
                 controller: amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: "Amount",
@@ -203,10 +205,13 @@ class _MyBalancePageState extends State<MyBalancePage>
                   Navigator.pop(context); // close dialog
                   paymentController.initiateCheckout(context, amount);
                 } else {
-                  Get.snackbar("Invalid Amount", "Please enter a valid amount to pay.", backgroundColor: Colors.red, colorText: Colors.white);
+                  Get.snackbar(
+                      "Invalid Amount", "Please enter a valid amount to pay.",
+                      backgroundColor: Colors.red, colorText: Colors.white);
                 }
               },
-              child: const Text("Pay Now", style: TextStyle(color: Colors.white)),
+              child:
+                  const Text("Pay Now", style: TextStyle(color: Colors.white)),
             ),
           ],
         );

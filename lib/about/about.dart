@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 /// A simple model for the About item.
 class AboutItem {
@@ -71,7 +71,8 @@ class _AboutPageState extends State<AboutPage> {
             errorMessage = "Unexpected data format.";
           }
         } else {
-          errorMessage = jsonResponse["message"] ?? "Failed to fetch about info.";
+          errorMessage =
+              jsonResponse["message"] ?? "Failed to fetch about info.";
         }
       } else {
         errorMessage = "Server error: ${response.statusCode}";
@@ -116,7 +117,6 @@ class _AboutPageState extends State<AboutPage> {
         title: const Text("About"),
         backgroundColor: Colors.transparent,
         elevation: 0,
-
         centerTitle: true,
       ),
       extendBodyBehindAppBar: true, // So the app bar floats over the header
@@ -133,7 +133,8 @@ class _AboutPageState extends State<AboutPage> {
 
           // Main content scroll view
           SingleChildScrollView(
-            padding: const EdgeInsets.only(top: 100, left: 16, right: 16, bottom: 16),
+            padding: const EdgeInsets.only(
+                top: 100, left: 16, right: 16, bottom: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -202,8 +203,8 @@ class _HeaderClipper extends CustomClipper<Path> {
     // Quadratic bezier curve for a smooth shape
     path.quadraticBezierTo(
       size.width / 2, // control point x
-      size.height,    // control point y
-      size.width,     // end point x
+      size.height, // control point y
+      size.width, // end point x
       size.height - 50, // end point y
     );
     path.lineTo(size.width, 0);

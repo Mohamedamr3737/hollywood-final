@@ -8,7 +8,8 @@ import 'cart_page.dart';
 import 'product_detail_page.dart';
 import '../../../auth/controller/token_controller.dart';
 import '../../../auth/view/login_page.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
+
 class ProductsPage extends StatefulWidget {
   const ProductsPage({Key? key}) : super(key: key);
 
@@ -182,7 +183,8 @@ class _ProductsPageState extends State<ProductsPage> {
             color: Colors.grey.shade600,
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
       ),
     );
@@ -360,16 +362,19 @@ class _ProductsPageState extends State<ProductsPage> {
 
           // Calculate responsive spacing and aspect ratio
           final spacing = screenWidth * 0.04; // 4% of screen width
-          final cardWidth = (screenWidth - (spacing * (crossAxisCount + 1))) / crossAxisCount;
+          final cardWidth =
+              (screenWidth - (spacing * (crossAxisCount + 1))) / crossAxisCount;
 
           // Dynamic aspect ratio based on screen height and card width
           double aspectRatio;
           if (screenHeight > 800) {
-            aspectRatio = cardWidth / (cardWidth * 1.4); // Taller cards on large screens
+            aspectRatio =
+                cardWidth / (cardWidth * 1.4); // Taller cards on large screens
           } else if (screenHeight > 600) {
             aspectRatio = cardWidth / (cardWidth * 1.3);
           } else {
-            aspectRatio = cardWidth / (cardWidth * 1.2); // Shorter cards on small screens
+            aspectRatio =
+                cardWidth / (cardWidth * 1.2); // Shorter cards on small screens
           }
 
           return GridView.builder(
@@ -390,7 +395,8 @@ class _ProductsPageState extends State<ProductsPage> {
     });
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product, BoxConstraints constraints) {
+  Widget _buildProductCard(
+      Map<String, dynamic> product, BoxConstraints constraints) {
     final title = product["title"] as String;
     final imageUrl = product["image"] as String;
     final price = product["price"] as double;
@@ -458,7 +464,8 @@ class _ProductsPageState extends State<ProductsPage> {
                         Positioned(
                           top: 4,
                           right: 4,
-                          child: _buildBadge(featured, hot, isNew, isSmallScreen),
+                          child:
+                              _buildBadge(featured, hot, isNew, isSmallScreen),
                         ),
                     ],
                   ),
@@ -483,11 +490,13 @@ class _ProductsPageState extends State<ProductsPage> {
                 // Price section - Fixed height
                 SizedBox(
                   height: isSmallScreen ? 35 : 40,
-                  child: _buildPriceSection(price, oldPrice, discountPercentage, priceFontSize, isSmallScreen),
+                  child: _buildPriceSection(price, oldPrice, discountPercentage,
+                      priceFontSize, isSmallScreen),
                 ),
                 SizedBox(height: isSmallScreen ? 8 : 12),
                 // Add to cart button - Fixed height
-                _buildAddToCartButton(product, canBuy, buttonHeight, buttonFontSize, isSmallScreen),
+                _buildAddToCartButton(product, canBuy, buttonHeight,
+                    buttonFontSize, isSmallScreen),
               ],
             ),
           ),
@@ -511,38 +520,39 @@ class _ProductsPageState extends State<ProductsPage> {
         borderRadius: BorderRadius.circular(isSmallScreen ? 12 : 16),
         child: url.isEmpty
             ? Icon(
-          Icons.image_not_supported_rounded,
-          size: isSmallScreen ? 30 : 40,
-          color: Colors.grey.shade400,
-        )
+                Icons.image_not_supported_rounded,
+                size: isSmallScreen ? 30 : 40,
+                color: Colors.grey.shade400,
+              )
             : Image.network(
-          url,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Icon(
-              Icons.image_not_supported_rounded,
-              size: isSmallScreen ? 30 : 40,
-              color: Colors.grey.shade400,
-            );
-          },
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Center(
-              child: SizedBox(
-                width: isSmallScreen ? 20 : 24,
-                height: isSmallScreen ? 20 : 24,
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                      : null,
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
-                  strokeWidth: 2,
-                ),
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.image_not_supported_rounded,
+                    size: isSmallScreen ? 30 : 40,
+                    color: Colors.grey.shade400,
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: SizedBox(
+                      width: isSmallScreen ? 20 : 24,
+                      height: isSmallScreen ? 20 : 24,
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.orange),
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
     );
   }
@@ -582,7 +592,8 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildPriceSection(double price, double? oldPrice, double discountPercentage, double fontSize, bool isSmallScreen) {
+  Widget _buildPriceSection(double price, double? oldPrice,
+      double discountPercentage, double fontSize, bool isSmallScreen) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -631,7 +642,8 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildAddToCartButton(Map<String, dynamic> product, bool canBuy, double height, double fontSize, bool isSmallScreen) {
+  Widget _buildAddToCartButton(Map<String, dynamic> product, bool canBuy,
+      double height, double fontSize, bool isSmallScreen) {
     return Container(
       width: double.infinity,
       height: height,
@@ -645,9 +657,10 @@ class _ProductsPageState extends State<ProductsPage> {
           borderRadius: BorderRadius.circular(height / 2),
           onTap: canBuy
               ? () {
-            CartPage.addToCart(product, 1);
-            AlertService.success(context, "${product["title"]} added to cart");
-          }
+                  CartPage.addToCart(product, 1);
+                  AlertService.success(
+                      context, "${product["title"]} added to cart");
+                }
               : null,
           child: Center(
             child: FittedBox(
@@ -691,7 +704,7 @@ class _ProductsPageState extends State<ProductsPage> {
               "Previous",
               Icons.chevron_left_rounded,
               currentPage > 1,
-                  () => _fetchFromServer(page: currentPage - 1),
+              () => _fetchFromServer(page: currentPage - 1),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -711,7 +724,7 @@ class _ProductsPageState extends State<ProductsPage> {
               "Next",
               Icons.chevron_right_rounded,
               currentPage < totalPages,
-                  () => _fetchFromServer(page: currentPage + 1),
+              () => _fetchFromServer(page: currentPage + 1),
             ),
           ],
         ),
@@ -719,7 +732,8 @@ class _ProductsPageState extends State<ProductsPage> {
     });
   }
 
-  Widget _buildPaginationButton(String text, IconData icon, bool enabled, VoidCallback? onTap) {
+  Widget _buildPaginationButton(
+      String text, IconData icon, bool enabled, VoidCallback? onTap) {
     return GestureDetector(
       onTap: enabled ? onTap : null,
       child: Container(
@@ -755,7 +769,8 @@ class _ProductsPageState extends State<ProductsPage> {
     });
   }
 
-  List<Map<String, dynamic>> _applyLocalFilter(List<Map<String, dynamic>> items) {
+  List<Map<String, dynamic>> _applyLocalFilter(
+      List<Map<String, dynamic>> items) {
     if (localFilter == "all") return items;
     return items.where((p) {
       if (localFilter == "featured") return p["featured"] == true;
@@ -785,8 +800,7 @@ class _ProductsPageState extends State<ProductsPage> {
           MaterialPageRoute(builder: (_) => const LoginView()),
         );
       });
-
-  }
+    }
 
 // Add your login status check logic here
     // This was called in initState but not defined in the original code

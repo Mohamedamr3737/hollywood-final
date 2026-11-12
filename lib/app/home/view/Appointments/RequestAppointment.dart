@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/AppointmentsController.dart';
-import 'package:s_medi/general/services/alert_service.dart';
-import 'package:s_medi/general/widgets/custom_time_picker.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/widgets/custom_time_picker.dart';
 
 class RequestAppointmentPage extends StatefulWidget {
   final Function(Map<String, String>) onAppointmentAdded;
@@ -34,7 +34,8 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
   };
 
   // Instantiate the AppointmentsController.
-  final AppointmentsController settingController = Get.put(AppointmentsController());
+  final AppointmentsController settingController =
+      Get.put(AppointmentsController());
 
   @override
   void dispose() {
@@ -49,13 +50,13 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
   List<String> getAvailableTimes() {
     if (selectedDepartment == null || selectedDoctor == null) return [];
     final department = settingController.settings.firstWhere(
-          (dept) => dept['title'] == selectedDepartment,
+      (dept) => dept['title'] == selectedDepartment,
       orElse: () => {},
     );
     if (department.isEmpty) return [];
     final doctors = List<Map<String, dynamic>>.from(department['doctor'] ?? []);
     final doctor = doctors.firstWhere(
-          (doc) => doc['name'] == selectedDoctor,
+      (doc) => doc['name'] == selectedDoctor,
       orElse: () => {},
     );
     if (doctor.isEmpty) return [];
@@ -67,7 +68,7 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
   List<String> getAvailableDoctors() {
     if (selectedDepartment == null) return [];
     final department = settingController.settings.firstWhere(
-          (dept) => dept['title'] == selectedDepartment,
+      (dept) => dept['title'] == selectedDepartment,
       orElse: () => {},
     );
     if (department.isEmpty) return [];
@@ -79,18 +80,19 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
   List<String> getAvailableServices() {
     if (selectedDepartment == null) return [];
     final department = settingController.settings.firstWhere(
-          (dept) => dept['title'] == selectedDepartment,
+      (dept) => dept['title'] == selectedDepartment,
       orElse: () => {},
     );
     if (department.isEmpty) return [];
-    final services = List<Map<String, dynamic>>.from(department['service'] ?? []);
+    final services =
+        List<Map<String, dynamic>>.from(department['service'] ?? []);
     return services.map((s) => s['title'].toString()).toList();
   }
 
   Widget _buildCustomTimePicker() {
     final timeOptions = getAvailableTimes();
     final isEnabled = selectedDoctor != null && timeOptions.isNotEmpty;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -172,8 +174,8 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
               final doctorOptions = selectedDepartment != null
                   ? getAvailableDoctors()
                   : <String>[];
-              final isEnabled = selectedDepartment != null &&
-                  doctorOptions.isNotEmpty;
+              final isEnabled =
+                  selectedDepartment != null && doctorOptions.isNotEmpty;
               return _buildDropdownField(
                 label: "Doctor",
                 options: doctorOptions,
@@ -194,8 +196,8 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
               final serviceOptions = selectedDepartment != null
                   ? getAvailableServices()
                   : <String>[];
-              final isEnabled = selectedDepartment != null &&
-                  serviceOptions.isNotEmpty;
+              final isEnabled =
+                  selectedDepartment != null && serviceOptions.isNotEmpty;
               return _buildDropdownField(
                 label: "Service",
                 options: serviceOptions,
@@ -235,13 +237,13 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
               onPressed: () async {
-
                 try {
                   final department = settingController.settings.firstWhere(
-                          (dept) => dept['title'] == selectedDepartment);
+                      (dept) => dept['title'] == selectedDepartment);
                   final deptId = department['id'];
                   final doctor = (department['doctor'] as List)
                       .firstWhere((doc) => doc['name'] == selectedDoctor);
@@ -272,7 +274,8 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
                       'time': selectedTime!,
                     });
                   } else {
-                    AlertService.appointmentError(context, settingController.errorMessage.value);
+                    AlertService.appointmentError(
+                        context, settingController.errorMessage.value);
                   }
                 } catch (e) {
                   AlertService.error(context, "Error: ${e.toString()}");
@@ -311,9 +314,9 @@ class _RequestAppointmentPageState extends State<RequestAppointmentPage> {
       value: value,
       items: options
           .map((val) => DropdownMenuItem(
-        value: val,
-        child: Text(val),
-      ))
+                value: val,
+                child: Text(val),
+              ))
           .toList(),
       onChanged: enabled ? onChanged : null,
       disabledHint: Text(value ?? "Select $label"),

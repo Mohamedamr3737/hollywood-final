@@ -3,22 +3,22 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_medi/app/home/view/Appointments/AppointmentsPage.dart';
-import 'package:s_medi/app/home/view/MyBalance/BalancePage.dart';
-import 'package:s_medi/app/home/view/MyOrder/MyOrderPage.dart';
-import 'package:s_medi/app/home/view/Prescription/PrescriptionPage.dart';
-import 'package:s_medi/app/home/view/Profile/ProfilePage.dart';
-import 'package:s_medi/app/home/view/SpecialOffers/SpecialOffersPage.dart';
+import 'package:hollywoodapp/app/home/view/Appointments/AppointmentsPage.dart';
+import 'package:hollywoodapp/app/home/view/MyBalance/BalancePage.dart';
+import 'package:hollywoodapp/app/home/view/MyOrder/MyOrderPage.dart';
+import 'package:hollywoodapp/app/home/view/Prescription/PrescriptionPage.dart';
+import 'package:hollywoodapp/app/home/view/Profile/ProfilePage.dart';
+import 'package:hollywoodapp/app/home/view/SpecialOffers/SpecialOffersPage.dart';
 import 'Sessions/MySessionsPage.dart';
-import 'package:s_medi/app/home/view/MyData/mydata.dart';
-import 'package:s_medi/app/home/view/MyRequests/SelectCategoryRequestPage.dart';
+import 'package:hollywoodapp/app/home/view/MyData/mydata.dart';
+import 'package:hollywoodapp/app/home/view/MyRequests/SelectCategoryRequestPage.dart';
 import 'Notifications/NotificationsPage.dart';
-import 'package:s_medi/app/home/view/Shop/ShopView.dart';
+import 'package:hollywoodapp/app/home/view/Shop/ShopView.dart';
 import '../controller/notifications_controller.dart';
 import '../controller/home_ads_controller.dart';
 import '../../auth/controller/token_controller.dart';
 import '../../../general/consts/consts.dart';
-import 'package:s_medi/serv/ServicesPage.dart';
+import 'package:hollywoodapp/serv/ServicesPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,7 +28,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  final NotificationsController _notificationsController = Get.find<NotificationsController>();
+  final NotificationsController _notificationsController =
+      Get.find<NotificationsController>();
   final HomeAdsController _adsController = Get.put(HomeAdsController());
   late AnimationController _shineController;
   late Animation<double> _shineAnimation;
@@ -55,7 +56,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // Fetch the initial unread count
     checkLoginAndFetchNotifications();
     _adsController.fetchAds().then((_) => _startBannerAutoScroll());
-
   }
 
   @override
@@ -75,7 +75,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void _startBannerAutoScroll() {
     _bannerTimer?.cancel();
     _bannerTimer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!_bannerPageController.hasClients || _adsController.ads.isEmpty) return;
+      if (!_bannerPageController.hasClients || _adsController.ads.isEmpty)
+        return;
       final nextPage = (_currentBannerIndex + 1) % _adsController.ads.length;
       _bannerPageController.animateToPage(
         nextPage,
@@ -238,7 +239,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.3),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.2)),
+                        border:
+                            Border.all(color: Colors.white.withOpacity(0.2)),
                       ),
                       child: IconButton(
                         icon: const Icon(
@@ -249,7 +251,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const NotificationsPage()),
                           );
                         },
                       ),
@@ -289,6 +293,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
   }
+
   Widget _buildBannerCarousel(double screenHeight) {
     return Obx(() {
       if (_adsController.isLoading.value) {
@@ -297,7 +302,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       if (_adsController.ads.isEmpty) {
         if (_adsController.errorMessage.isNotEmpty) {
-          return _buildBannerError(screenHeight, _adsController.errorMessage.value);
+          return _buildBannerError(
+              screenHeight, _adsController.errorMessage.value);
         }
         return SizedBox(
           height: screenHeight * 0.25,
@@ -308,7 +314,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             errorBuilder: (context, error, stackTrace) {
               return Container(
                 color: Colors.grey.shade200,
-                child: const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+                child: const Icon(Icons.image_not_supported,
+                    size: 40, color: Colors.grey),
               );
             },
           ),
@@ -338,7 +345,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   return SizedBox(
                     width: double.infinity,
                     child: Image.network(
-                      ad.imageUrl.isNotEmpty ? ad.imageUrl : AppAssets.placeholderImageUrl,
+                      ad.imageUrl.isNotEmpty
+                          ? ad.imageUrl
+                          : AppAssets.placeholderImageUrl,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       loadingBuilder: (context, child, loadingProgress) {
@@ -348,7 +357,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: Colors.grey.shade200,
-                          child: const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+                          child: const Icon(Icons.image_not_supported,
+                              size: 40, color: Colors.grey),
                         );
                       },
                     ),
@@ -380,11 +390,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                          border: Border.all(
+                              color: Colors.white.withOpacity(0.3), width: 1),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),
@@ -479,12 +491,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Build each icon option with realistic glass effect and circular animated shine
   Widget _buildGlassOption(
-      BuildContext context,
-      String imageUrl,
-      String label,
-      Widget page,
-      double screenWidth,
-      ) {
+    BuildContext context,
+    String imageUrl,
+    String label,
+    Widget page,
+    double screenWidth,
+  ) {
     double iconSize = screenWidth * 0.3;
     double fontSize = screenWidth * 0.04;
 
@@ -568,12 +580,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               borderRadius: BorderRadius.circular(20),
                               gradient: RadialGradient(
                                 center: Alignment.center,
-                                radius: _shineAnimation.value * 1.2, // Animate radius from 0 to 1.2
+                                radius: _shineAnimation.value *
+                                    1.2, // Animate radius from 0 to 1.2
                                 colors: [
-                                  Colors.white.withOpacity(0.8 * (1 - _shineAnimation.value)), // Fade as it expands
-                                  Colors.white.withOpacity(0.6 * (1 - _shineAnimation.value)),
-                                  Colors.white.withOpacity(0.3 * (1 - _shineAnimation.value)),
-                                  Colors.white.withOpacity(0.1 * (1 - _shineAnimation.value)),
+                                  Colors.white.withOpacity(0.8 *
+                                      (1 -
+                                          _shineAnimation
+                                              .value)), // Fade as it expands
+                                  Colors.white.withOpacity(
+                                      0.6 * (1 - _shineAnimation.value)),
+                                  Colors.white.withOpacity(
+                                      0.3 * (1 - _shineAnimation.value)),
+                                  Colors.white.withOpacity(
+                                      0.1 * (1 - _shineAnimation.value)),
                                   Colors.transparent,
                                 ],
                                 stops: [

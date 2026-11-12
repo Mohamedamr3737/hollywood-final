@@ -6,8 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../controller/profile_controller.dart';
 import '../../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
   @override
@@ -39,11 +40,12 @@ class _ProfilePageState extends State<ProfilePage> {
         Provider.of<ProfileController>(context, listen: false).fetchProfile());
   }
 
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now().subtract(const Duration(days: 365 * 25)), // Default to 25 years ago
+      initialDate: selectedDate ??
+          DateTime.now().subtract(
+              const Duration(days: 365 * 25)), // Default to 25 years ago
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (context, child) {
@@ -60,11 +62,12 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       },
     );
-    
+
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
-        birthdayController.text = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+        birthdayController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
     }
   }
@@ -77,16 +80,17 @@ class _ProfilePageState extends State<ProfilePage> {
         maxHeight: 1024,
         imageQuality: 85,
       );
-      
+
       if (image != null) {
         setState(() {
           selectedImage = File(image.path);
         });
       }
     } catch (e) {
-      print(e);
-      if (e.toString().contains('Permission denied') || e.toString().contains('permission')) {
-        AlertService.warning(context, "Permission denied. Please allow camera/photo access in device settings.");
+      if (e.toString().contains('Permission denied') ||
+          e.toString().contains('permission')) {
+        AlertService.warning(context,
+            "Permission denied. Please allow camera/photo access in device settings.");
       } else {
         AlertService.error(context, "Error picking image: $e");
       }
@@ -101,7 +105,8 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Wrap(
             children: [
               ListTile(
-                leading: const Icon(Icons.photo_library, color: Colors.orangeAccent),
+                leading:
+                    const Icon(Icons.photo_library, color: Colors.orangeAccent),
                 title: const Text('Choose from Gallery'),
                 onTap: () {
                   Navigator.pop(context);
@@ -109,7 +114,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt, color: Colors.orangeAccent),
+                leading:
+                    const Icon(Icons.camera_alt, color: Colors.orangeAccent),
                 title: const Text('Take Photo'),
                 onTap: () {
                   Navigator.pop(context);
@@ -136,7 +142,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void updateProfile() async {
     final profileController =
-    Provider.of<ProfileController>(context, listen: false);
+        Provider.of<ProfileController>(context, listen: false);
 
     final updatedData = {
       "name": nameController.text,
@@ -144,10 +150,11 @@ class _ProfilePageState extends State<ProfilePage> {
       "birthday": birthdayController.text,
       "email": emailController.text,
       "address": addressController.text,
-      "phone": profileController.userData?["phone"],  // 👈 include pho
+      "phone": profileController.userData?["phone"], // 👈 include pho
     };
 
-    await profileController.updateProfile(updatedData, context, imageFile: selectedImage);
+    await profileController.updateProfile(updatedData, context,
+        imageFile: selectedImage);
 
     if (profileController.errorMessage.isEmpty) {
       setState(() {
@@ -215,19 +222,19 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 // Get the existing profile data
                 final profileController =
-                Provider.of<ProfileController>(context, listen: false);
+                    Provider.of<ProfileController>(context, listen: false);
 
                 // Prepare complete updated data with existing values
                 Map<String, dynamic> updatedData = {
                   "name": profileController.userData?["name"] ?? "",
                   "gender": profileController.userData?["gender"] ?? "",
-                  "birthday": profileController.userData?["birthday"] ??"",
+                  "birthday": profileController.userData?["birthday"] ?? "",
                   "email": profileController.userData?["email"] ?? "",
                   "address": profileController.userData?["address"] ?? "",
                   "password": passwordController.text,
                   "password_confirmation": confirmPasswordController.text,
-                  "phone": profileController.userData?["phone"],  // 👈 include phone
-
+                  "phone":
+                      profileController.userData?["phone"], // 👈 include phone
                 };
 
                 // Send update request
@@ -245,9 +252,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     final profileController = Provider.of<ProfileController>(context);
@@ -258,7 +262,7 @@ class _ProfilePageState extends State<ProfilePage> {
       idController.text = userData["uid"] ?? "N/A";
       ageController.text = userData["age"]?.toString() ?? "N/A";
       birthdayController.text = userData["birthday"] ?? "N/A";
-      
+
       // Parse existing birthday to set selectedDate
       if (userData["birthday"] != null && userData["birthday"] != "N/A") {
         try {
@@ -266,260 +270,273 @@ class _ProfilePageState extends State<ProfilePage> {
         } catch (e) {
           // If parsing fails, try alternative formats
           try {
-            selectedDate = DateTime.parse(userData["birthday"].replaceAll("/", "-"));
+            selectedDate =
+                DateTime.parse(userData["birthday"].replaceAll("/", "-"));
           } catch (e2) {
             selectedDate = null;
           }
         }
       }
-      
+
       emailController.text = userData["email"] ?? "N/A";
       membershipController.text = userData["membership"] ?? "N/A";
       addressController.text = userData["address"] ?? "N/A";
-      genderController.text= userData['gender']?? "N/A";
+      genderController.text = userData['gender'] ?? "N/A";
       profileImage = userData["image"] ?? "${ApiConfig.baseUrl}/no-image.png";
     }
 
     return Scaffold(
       body: profileController.isLoading
           ? const Center(child: CircularProgressIndicator())
-
           : Stack(
-        children: [
-          // Background image with AppBar overlay
-          Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      AppAssets.placeholderImageUrl,
+              children: [
+                // Background image with AppBar overlay
+                Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            AppAssets.placeholderImageUrl,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 100), // Space for circular profile image
-            ],
-          ),
-          // Positioned Circular Image
-          Positioned(
-            top: 140,
-            left: MediaQuery.of(context).size.width / 2 - 70,
-            child: GestureDetector(
-              onTap: isEditing ? _showImagePicker : null,
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
+                    const SizedBox(
+                        height: 100), // Space for circular profile image
                   ],
                 ),
-                child: Stack(
-                  children: [
-                    ClipOval(
-                      child: selectedImage != null
-                          ? Image.file(
-                              selectedImage!,
-                              width: 140,
-                              height: 140,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.network(
-                              profileImage,
-                              width: 140,
-                              height: 140,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: 140,
-                                  height: 140,
-                                  color: Colors.grey[300],
-                                  child: const Icon(
-                                    Icons.person,
-                                    size: 60,
-                                    color: Colors.grey,
-                                  ),
-                                );
-                              },
-                            ),
-                    ),
-                    if (isEditing)
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.orangeAccent,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
+                // Positioned Circular Image
+                Positioned(
+                  top: 140,
+                  left: MediaQuery.of(context).size.width / 2 - 70,
+                  child: GestureDetector(
+                    onTap: isEditing ? _showImagePicker : null,
+                    child: Container(
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
-                          child: const Icon(
-                            Icons.camera_alt,
-                            color: Colors.white,
-                            size: 20,
+                        ],
+                      ),
+                      child: Stack(
+                        children: [
+                          ClipOval(
+                            child: selectedImage != null
+                                ? Image.file(
+                                    selectedImage!,
+                                    width: 140,
+                                    height: 140,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.network(
+                                    profileImage,
+                                    width: 140,
+                                    height: 140,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: 140,
+                                        height: 140,
+                                        color: Colors.grey[300],
+                                        child: const Icon(
+                                          Icons.person,
+                                          size: 60,
+                                          color: Colors.grey,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                          if (isEditing)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.orangeAccent,
+                                  shape: BoxShape.circle,
+                                  border:
+                                      Border.all(color: Colors.white, width: 3),
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Content
+                Positioned.fill(
+                  top: 280,
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      const Center(
+                        child: Text(
+                          "Personal Info",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
                           ),
                         ),
                       ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Content
-          Positioned.fill(
-            top: 280,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                const Center(
-                  child: Text(
-                    "Personal Info",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                _buildInfoField("Name", nameController),
-                _buildInfoField("ID", idController, enabled: false),
-                _buildInfoField("Age", ageController, enabled: false), // Age uneditable
-                _buildBirthdayField(),
-                _buildInfoField("Email", emailController),
-                _buildInfoField("Gender", genderController),
-                _buildInfoField("Membership", membershipController, enabled: false),
-                _buildInfoField("Address", addressController),
-                const SizedBox(height: 30),
-                if (isEditing)
-                  ElevatedButton(
-                    onPressed: updateProfile,
-                    child: const Text("Save Changes"),
-                  ),
-                const Divider(),
-                ListTile(
-                  title: const Text(
-                    "Change Password",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  onTap: () {
-                    // Change password logic
-                    showChangePasswordDialog();
-                  },
-                ),
-                ListTile(
-                  title: const Text(
-                    "Delete Account",
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-                  onTap: () async {
-                    // Delete account logic
-                    // Show confirmation dialog before deletion.
-                    bool? confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text("Confirm Deletion"),
-                          content: const Text("Are you sure you want to delete your account? This action cannot be undone."),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(false); // Cancel deletion.
-                              },
-                              child: const Text("Cancel"),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(true); // Confirm deletion.
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                              ),
-                              child: const Text("Delete"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                      const SizedBox(height: 20),
+                      _buildInfoField("Name", nameController),
+                      _buildInfoField("ID", idController, enabled: false),
+                      _buildInfoField("Age", ageController,
+                          enabled: false), // Age uneditable
+                      _buildBirthdayField(),
+                      _buildInfoField("Email", emailController),
+                      _buildInfoField("Gender", genderController),
+                      _buildInfoField("Membership", membershipController,
+                          enabled: false),
+                      _buildInfoField("Address", addressController),
+                      const SizedBox(height: 30),
+                      if (isEditing)
+                        ElevatedButton(
+                          onPressed: updateProfile,
+                          child: const Text("Save Changes"),
+                        ),
+                      const Divider(),
+                      ListTile(
+                        title: const Text(
+                          "Change Password",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () {
+                          // Change password logic
+                          showChangePasswordDialog();
+                        },
+                      ),
+                      ListTile(
+                        title: const Text(
+                          "Delete Account",
+                          style: TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () async {
+                          // Delete account logic
+                          // Show confirmation dialog before deletion.
+                          bool? confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("Confirm Deletion"),
+                                content: const Text(
+                                    "Are you sure you want to delete your account? This action cannot be undone."),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(false); // Cancel deletion.
+                                    },
+                                    child: const Text("Cancel"),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(true); // Confirm deletion.
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                    ),
+                                    child: const Text("Delete"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
 
-                    if (confirm == true) {
-                      await Provider.of<ProfileController>(context, listen: false)
-                          .deleteAccount(context);
-                    }
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text(
-                    "Sign Out",
-                    style: TextStyle(color: Colors.red),
+                          if (confirm == true) {
+                            await Provider.of<ProfileController>(context,
+                                    listen: false)
+                                .deleteAccount(context);
+                          }
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.logout, color: Colors.red),
+                        title: const Text(
+                          "Sign Out",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        onTap: () async {
+                          await Provider.of<ProfileController>(context,
+                                  listen: false)
+                              .signOut(context);
+                        },
+                      ),
+                    ],
                   ),
-                  onTap: () async {
-                    await Provider.of<ProfileController>(context, listen: false)
-                        .signOut(context);                  },
+                ),
+                // Black AppBar
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: AppBar(
+                    backgroundColor: Colors.black,
+                    elevation: 0,
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Colors.orangeAccent),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    title: const Text(
+                      "My Profile",
+                      style: TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    centerTitle: true,
+                    actions: [
+                      IconButton(
+                        icon: Icon(
+                          isEditing ? Icons.check : Icons.edit,
+                          color: Colors.orangeAccent,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            if (isEditing) {
+                              updateProfile();
+                            }
+                            isEditing = !isEditing;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-          // Black AppBar
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AppBar(
-              backgroundColor: Colors.black,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.orangeAccent),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              title: const Text(
-                "My Profile",
-                style: TextStyle(
-                  color: Colors.orangeAccent,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              centerTitle: true,
-              actions: [
-                IconButton(
-                  icon: Icon(
-                    isEditing ? Icons.check : Icons.edit,
-                    color: Colors.orangeAccent,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      if(isEditing){
-                        updateProfile();
-                      }
-                      isEditing = !isEditing;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
-  Widget _buildInfoField(String label, TextEditingController controller, {bool enabled = true}) {
+  Widget _buildInfoField(String label, TextEditingController controller,
+      {bool enabled = true}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -540,13 +557,15 @@ class _ProfilePageState extends State<ProfilePage> {
             decoration: InputDecoration(
               filled: true,
               fillColor: isEditing && enabled ? Colors.white : Colors.grey[200],
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: Colors.grey.shade300),
               ),
             ),
-            style: TextStyle(color: isEditing && enabled ? Colors.black87 : Colors.grey),
+            style: TextStyle(
+                color: isEditing && enabled ? Colors.black87 : Colors.grey),
           ),
         ],
       ),
@@ -581,10 +600,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Expanded(
                     child: Text(
-                      selectedDate != null 
+                      selectedDate != null
                           ? "${selectedDate!.day.toString().padLeft(2, '0')}/${selectedDate!.month.toString().padLeft(2, '0')}/${selectedDate!.year}"
-                          : birthdayController.text != "N/A" 
-                              ? birthdayController.text 
+                          : birthdayController.text != "N/A"
+                              ? birthdayController.text
                               : "Select your birthday",
                       style: TextStyle(
                         color: isEditing ? Colors.black87 : Colors.grey,

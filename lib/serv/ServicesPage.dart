@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_html/flutter_html.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 // If you want to parse HTML in ServiceDetailPage, import flutter_html there.
 
@@ -28,9 +28,6 @@ class ServiceDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Debug: Print the service data to see what we're working with
-    print("Service Body: ${service.body}");
-    print("Service Details: ${service.details}");
-    print("Service Description: ${service.description}");
 
     return Scaffold(
       appBar: AppBar(
@@ -62,15 +59,9 @@ class ServiceDetailPage extends StatelessWidget {
             onProgress: (int progress) {
               // Update loading progress
             },
-            onPageStarted: (String url) {
-              print("Page started loading: $url");
-            },
-            onPageFinished: (String url) {
-              print("Page finished loading: $url");
-            },
-            onWebResourceError: (WebResourceError error) {
-              print("WebView error: ${error.description}");
-            },
+            onPageStarted: (String url) {},
+            onPageFinished: (String url) {},
+            onWebResourceError: (WebResourceError error) {},
           ),
         )
         ..loadRequest(Uri.parse(iframeUrl)),
@@ -227,7 +218,6 @@ class Service {
   /// Factory constructor to parse JSON from the API.
   factory Service.fromJson(Map<String, dynamic> json) {
     // Debug: Print the raw JSON to see what fields are available
-    print("Raw Service JSON: $json");
 
     // Try different possible field names for the body/content
     String bodyContent = "";

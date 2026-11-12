@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../../controller/notifications_controller.dart';
 import 'package:get/get.dart';
 import '../../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -13,7 +13,8 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  final NotificationsController _controller = Get.find<NotificationsController>();
+  final NotificationsController _controller =
+      Get.find<NotificationsController>();
   Future<List<NotificationItem>>? _futureNotifications;
 
   @override
@@ -25,16 +26,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   void checkLoginAndFetchNotifications() async {
-
     if (await getAccessToken() != null) {
       setState(() {
         _controller.fetchUnreadCount();
         _futureNotifications = _controller.fetchNotifications();
       });
-
     }
   }
-
 
   /// Marks a notification as read and then refetches notifications
   Future<void> _onNotificationTap(NotificationItem notification) async {
@@ -59,7 +57,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
       });
       AlertService.notificationsCleared(context);
     } catch (e) {
-      AlertService.notificationsError(context, 'Error clearing notifications: $e');
+      AlertService.notificationsError(
+          context, 'Error clearing notifications: $e');
     }
   }
 
@@ -108,11 +107,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   formattedTime = DateFormat('hh:mm a').format(dateTime);
                 }
 
-                final Color cardColor = isUnread ? Colors.orangeAccent : Colors.white;
+                final Color cardColor =
+                    isUnread ? Colors.orangeAccent : Colors.white;
                 final Color textColor = isUnread ? Colors.white : Colors.black;
-                final Color subtitleColor = isUnread ? Colors.white70 : Colors.black87;
+                final Color subtitleColor =
+                    isUnread ? Colors.white70 : Colors.black87;
                 final Color dateColor = isUnread ? Colors.white70 : Colors.grey;
-                final Color iconColor = isUnread ? Colors.white : Colors.orangeAccent;
+                final Color iconColor =
+                    isUnread ? Colors.white : Colors.orangeAccent;
 
                 return InkWell(
                   onTap: () => _onNotificationTap(notification),
@@ -160,11 +162,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
                             children: [
                               Text(
                                 formattedDate,
-                                style: TextStyle(fontSize: 12, color: dateColor),
+                                style:
+                                    TextStyle(fontSize: 12, color: dateColor),
                               ),
                               Text(
                                 formattedTime,
-                                style: TextStyle(fontSize: 12, color: dateColor),
+                                style:
+                                    TextStyle(fontSize: 12, color: dateColor),
                               ),
                             ],
                           ),

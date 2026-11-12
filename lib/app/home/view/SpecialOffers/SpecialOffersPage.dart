@@ -423,7 +423,6 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
                     child: Column(
                       children: [
                         const SizedBox(height: 80),
-
                         const SizedBox(height: 20),
                         for (var offer in offers)
                           Padding(
@@ -455,7 +454,7 @@ class _SpecialOffersPageState extends State<SpecialOffersPage> {
 class OfferCard extends StatelessWidget {
   final Offer offer;
   final VoidCallback onRefresh;
-  
+
   const OfferCard({required this.offer, required this.onRefresh});
 
   @override
@@ -671,7 +670,9 @@ class OfferDetailPage extends StatefulWidget {
   final Offer offer;
   final VoidCallback onRefresh;
 
-  const OfferDetailPage({Key? key, required this.offer, required this.onRefresh}) : super(key: key);
+  const OfferDetailPage(
+      {Key? key, required this.offer, required this.onRefresh})
+      : super(key: key);
 
   @override
   State<OfferDetailPage> createState() => _OfferDetailPageState();
@@ -704,9 +705,6 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
   @override
   Widget build(BuildContext context) {
     // Debug: Print the offer data to see what we're working with
-    print("Offer Body: ${widget.offer.body}");
-    print("Offer Description: ${widget.offer.shortDescription}");
-    print("Offer Registered: ${widget.offer.registered}");
 
     return Scaffold(
       appBar: AppBar(
@@ -769,7 +767,8 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
                       setState(() {
                         isRegistering = true;
                       });
-                      final success = await _controller.registerOffer(widget.offer.id);
+                      final success =
+                          await _controller.registerOffer(widget.offer.id);
                       setState(() {
                         isRegistering = false;
                         if (success) {
@@ -835,15 +834,9 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
             onProgress: (int progress) {
               // Update loading progress
             },
-            onPageStarted: (String url) {
-              print("Page started loading: $url");
-            },
-            onPageFinished: (String url) {
-              print("Page finished loading: $url");
-            },
-            onWebResourceError: (WebResourceError error) {
-              print("WebView error: ${error.description}");
-            },
+            onPageStarted: (String url) {},
+            onPageFinished: (String url) {},
+            onWebResourceError: (WebResourceError error) {},
           ),
         )
         ..loadRequest(Uri.parse(iframeUrl)),
@@ -910,17 +903,15 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
               children: [
                 Icon(
                   isRegistered ? Icons.check_circle : Icons.local_offer,
-                  color:
-                      isRegistered ? Colors.green[700] : Colors.orange[700],
+                  color: isRegistered ? Colors.green[700] : Colors.orange[700],
                   size: 16,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   isRegistered ? "Registered" : "Available",
                   style: TextStyle(
-                    color: isRegistered
-                        ? Colors.green[700]
-                        : Colors.orange[700],
+                    color:
+                        isRegistered ? Colors.green[700] : Colors.orange[700],
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),

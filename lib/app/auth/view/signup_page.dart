@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_medi/app/auth/controller/signup_controller.dart';
-import 'package:s_medi/app/widgets/loading_indicator.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/app/auth/controller/signup_controller.dart';
+import 'package:hollywoodapp/app/widgets/loading_indicator.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 import 'login_page.dart';
 
 class SignupView extends StatefulWidget {
@@ -19,7 +19,7 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   final ScrollController _scrollController = ScrollController();
-  
+
   // Create a unique form key for this specific signup view
   final GlobalKey<FormState> _signupFormKey = GlobalKey<FormState>();
 
@@ -126,13 +126,16 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                           child: Column(
                             children: [
                               // Top safe area padding
-                              SizedBox(height: MediaQuery.of(context).padding.top + 20),
-                              
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).padding.top + 20),
+
                               // Image section with conditional height based on keyboard
                               AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
-                                height: keyboardHeight > 0 
-                                    ? availableHeight * 0.15  // Smaller when keyboard is open
+                                height: keyboardHeight > 0
+                                    ? availableHeight *
+                                        0.15 // Smaller when keyboard is open
                                     : availableHeight * 0.25, // Normal size
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -192,26 +195,36 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                   fit: BoxFit.cover,
                                                 ),
                                                 borderRadius: BorderRadius.only(
-                                                  bottomLeft: Radius.circular(46),
+                                                  bottomLeft:
+                                                      Radius.circular(46),
                                                 ),
                                               ),
                                             ),
                                             // Glass reflection overlay
                                             Container(
                                               decoration: BoxDecoration(
-                                                borderRadius: const BorderRadius.only(
-                                                  bottomLeft: Radius.circular(46),
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(46),
                                                 ),
                                                 gradient: LinearGradient(
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                   colors: [
-                                                    Colors.white.withOpacity(0.3),
+                                                    Colors.white
+                                                        .withOpacity(0.3),
                                                     Colors.transparent,
                                                     Colors.transparent,
-                                                    Colors.black.withOpacity(0.1),
+                                                    Colors.black
+                                                        .withOpacity(0.1),
                                                   ],
-                                                  stops: const [0.0, 0.3, 0.7, 1.0],
+                                                  stops: const [
+                                                    0.0,
+                                                    0.3,
+                                                    0.7,
+                                                    1.0
+                                                  ],
                                                 ),
                                               ),
                                             ),
@@ -225,8 +238,10 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
                                                     colors: [
-                                                      Colors.white.withOpacity(0.9),
-                                                      Colors.white.withOpacity(0.3),
+                                                      Colors.white
+                                                          .withOpacity(0.9),
+                                                      Colors.white
+                                                          .withOpacity(0.3),
                                                     ],
                                                   ),
                                                 ),
@@ -277,36 +292,48 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(25),
                                       child: BackdropFilter(
-                                        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                                        filter: ImageFilter.blur(
+                                            sigmaX: 15, sigmaY: 15),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             // Welcome text with glassmorphism
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16,
+                                                      vertical: 12),
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(15),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
                                                 gradient: LinearGradient(
                                                   colors: [
-                                                    Colors.white.withOpacity(0.3),
-                                                    Colors.white.withOpacity(0.1),
+                                                    Colors.white
+                                                        .withOpacity(0.3),
+                                                    Colors.white
+                                                        .withOpacity(0.1),
                                                   ],
                                                 ),
                                                 border: Border.all(
-                                                  color: Colors.white.withOpacity(0.2),
+                                                  color: Colors.white
+                                                      .withOpacity(0.2),
                                                   width: 1,
                                                 ),
                                               ),
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'Welcome To Hollywood Clinic',
                                                     style: TextStyle(
                                                       fontSize: 20,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: Colors.black.withOpacity(0.8),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.black
+                                                          .withOpacity(0.8),
                                                       letterSpacing: -0.5,
                                                     ),
                                                   ),
@@ -315,8 +342,10 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                     'Create an Account',
                                                     style: TextStyle(
                                                       fontSize: 16,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: Colors.black.withOpacity(0.6),
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.black
+                                                          .withOpacity(0.6),
                                                     ),
                                                   ),
                                                 ],
@@ -332,8 +361,10 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   _buildGlassmorphismTextField(
-                                                    controller: controller.nameController,
-                                                    validator: controller.validateName,
+                                                    controller: controller
+                                                        .nameController,
+                                                    validator:
+                                                        controller.validateName,
                                                     icon: Icons.person,
                                                     hint: "Full Name",
                                                   ),
@@ -341,8 +372,10 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                   const SizedBox(height: 12),
 
                                                   _buildGlassmorphismTextField(
-                                                    controller: controller.phoneController,
-                                                    validator: controller.validatePhone,
+                                                    controller: controller
+                                                        .phoneController,
+                                                    validator: controller
+                                                        .validatePhone,
                                                     icon: Icons.phone,
                                                     hint: "Phone Number",
                                                   ),
@@ -350,8 +383,10 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                   const SizedBox(height: 12),
 
                                                   _buildGlassmorphismTextField(
-                                                    controller: controller.emailController,
-                                                    validator: controller.validateEmail,
+                                                    controller: controller
+                                                        .emailController,
+                                                    validator: controller
+                                                        .validateEmail,
                                                     icon: Icons.email_outlined,
                                                     hint: "Email",
                                                   ),
@@ -361,69 +396,116 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                   // Glassmorphism Dropdown
                                                   Container(
                                                     decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(16),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16),
                                                       gradient: LinearGradient(
-                                                        begin: Alignment.topLeft,
-                                                        end: Alignment.bottomRight,
+                                                        begin:
+                                                            Alignment.topLeft,
+                                                        end: Alignment
+                                                            .bottomRight,
                                                         colors: [
-                                                          Colors.white.withOpacity(0.3),
-                                                          Colors.white.withOpacity(0.1),
+                                                          Colors.white
+                                                              .withOpacity(0.3),
+                                                          Colors.white
+                                                              .withOpacity(0.1),
                                                         ],
                                                       ),
                                                       border: Border.all(
-                                                        color: Colors.white.withOpacity(0.2),
+                                                        color: Colors.white
+                                                            .withOpacity(0.2),
                                                         width: 1,
                                                       ),
                                                       boxShadow: [
                                                         BoxShadow(
-                                                          color: Colors.black.withOpacity(0.05),
+                                                          color: Colors.black
+                                                              .withOpacity(
+                                                                  0.05),
                                                           blurRadius: 10,
-                                                          offset: const Offset(0, 5),
+                                                          offset: const Offset(
+                                                              0, 5),
                                                         ),
                                                       ],
                                                     ),
                                                     child: ClipRRect(
-                                                      borderRadius: BorderRadius.circular(16),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16),
                                                       child: BackdropFilter(
-                                                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                                        child: DropdownButtonFormField<String>(
-                                                          decoration: InputDecoration(
+                                                        filter:
+                                                            ImageFilter.blur(
+                                                                sigmaX: 10,
+                                                                sigmaY: 10),
+                                                        child:
+                                                            DropdownButtonFormField<
+                                                                String>(
+                                                          decoration:
+                                                              InputDecoration(
                                                             prefixIcon: Icon(
                                                               Icons.person,
-                                                              color: Colors.black.withOpacity(0.6),
+                                                              color: Colors
+                                                                  .black
+                                                                  .withOpacity(
+                                                                      0.6),
                                                               size: 22,
                                                             ),
-                                                            hintText: "Select Gender",
-                                                            hintStyle: TextStyle(
-                                                              color: Colors.black.withOpacity(0.4),
+                                                            hintText:
+                                                                "Select Gender",
+                                                            hintStyle:
+                                                                TextStyle(
+                                                              color: Colors
+                                                                  .black
+                                                                  .withOpacity(
+                                                                      0.4),
                                                               fontSize: 15,
                                                             ),
-                                                            border: InputBorder.none,
-                                                            contentPadding: const EdgeInsets.symmetric(
-                                                                horizontal: 16,
-                                                                vertical: 16
-                                                            ),
+                                                            border: InputBorder
+                                                                .none,
+                                                            contentPadding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        16,
+                                                                    vertical:
+                                                                        16),
                                                             filled: true,
-                                                            fillColor: Colors.transparent,
+                                                            fillColor: Colors
+                                                                .transparent,
                                                           ),
-                                                          dropdownColor: Colors.white.withOpacity(0.95),
+                                                          dropdownColor: Colors
+                                                              .white
+                                                              .withOpacity(
+                                                                  0.95),
                                                           style: TextStyle(
-                                                            color: Colors.black.withOpacity(0.8),
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.8),
                                                             fontSize: 16,
-                                                            fontWeight: FontWeight.w500,
+                                                            fontWeight:
+                                                                FontWeight.w500,
                                                           ),
-                                                          items: ['Male', 'Female', 'Other']
-                                                              .map((gender) => DropdownMenuItem(
-                                                            value: gender,
-                                                            child: Text(gender),
-                                                          ))
+                                                          items: [
+                                                            'Male',
+                                                            'Female',
+                                                            'Other'
+                                                          ]
+                                                              .map((gender) =>
+                                                                  DropdownMenuItem(
+                                                                    value:
+                                                                        gender,
+                                                                    child: Text(
+                                                                        gender),
+                                                                  ))
                                                               .toList(),
                                                           onChanged: (value) {
-                                                            controller.selectedGender.value = value!;
+                                                            controller
+                                                                .selectedGender
+                                                                .value = value!;
                                                           },
-                                                          validator: (value) => value == null
-                                                              ? 'Please select a gender'
-                                                              : null,
+                                                          validator: (value) =>
+                                                              value == null
+                                                                  ? 'Please select a gender'
+                                                                  : null,
                                                         ),
                                                       ),
                                                     ),
@@ -432,8 +514,10 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                   const SizedBox(height: 12),
 
                                                   _buildGlassmorphismTextField(
-                                                    controller: controller.passwordController,
-                                                    validator: controller.validatePassword,
+                                                    controller: controller
+                                                        .passwordController,
+                                                    validator: controller
+                                                        .validatePassword,
                                                     icon: Icons.lock,
                                                     hint: "Password",
                                                     isPassword: true,
@@ -442,8 +526,10 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                                   const SizedBox(height: 12),
 
                                                   _buildGlassmorphismTextField(
-                                                    controller: controller.confirmPasswordController,
-                                                    validator: controller.validateConfirmPassword,
+                                                    controller: controller
+                                                        .confirmPasswordController,
+                                                    validator: controller
+                                                        .validateConfirmPassword,
                                                     icon: Icons.lock,
                                                     hint: "Confirm Password",
                                                     isPassword: true,
@@ -453,26 +539,36 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
 
                                                   // Terms and conditions with glassmorphism
                                                   Container(
-                                                    padding: const EdgeInsets.all(12),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
                                                     decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(12),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
                                                       gradient: LinearGradient(
                                                         colors: [
-                                                          Colors.white.withOpacity(0.2),
-                                                          Colors.white.withOpacity(0.05),
+                                                          Colors.white
+                                                              .withOpacity(0.2),
+                                                          Colors.white
+                                                              .withOpacity(
+                                                                  0.05),
                                                         ],
                                                       ),
                                                       border: Border.all(
-                                                        color: Colors.white.withOpacity(0.1),
+                                                        color: Colors.white
+                                                            .withOpacity(0.1),
                                                         width: 1,
                                                       ),
                                                     ),
                                                     child: Text(
                                                       "By creating an account, you agree to our terms of service and privacy policy and you will receive a confirmation code on your mobile",
-                                                      textAlign: TextAlign.center,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       style: TextStyle(
                                                         fontSize: 11,
-                                                        color: Colors.black.withOpacity(0.6),
+                                                        color: Colors.black
+                                                            .withOpacity(0.6),
                                                         height: 1.3,
                                                       ),
                                                     ),
@@ -482,54 +578,92 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
 
                                                   // Glassmorphism continue button
                                                   Container(
-                                                    width: MediaQuery.of(context).size.width * 0.8,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.8,
                                                     height: 50,
                                                     decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(25),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              25),
                                                       gradient: LinearGradient(
-                                                        begin: Alignment.topLeft,
-                                                        end: Alignment.bottomRight,
+                                                        begin:
+                                                            Alignment.topLeft,
+                                                        end: Alignment
+                                                            .bottomRight,
                                                         colors: [
-                                                          const Color.fromARGB(255, 3, 23, 40).withOpacity(0.9),
-                                                          const Color.fromARGB(255, 3, 23, 40).withOpacity(0.7),
+                                                          const Color.fromARGB(
+                                                                  255,
+                                                                  3,
+                                                                  23,
+                                                                  40)
+                                                              .withOpacity(0.9),
+                                                          const Color.fromARGB(
+                                                                  255,
+                                                                  3,
+                                                                  23,
+                                                                  40)
+                                                              .withOpacity(0.7),
                                                         ],
                                                       ),
                                                       boxShadow: [
                                                         BoxShadow(
-                                                          color: const Color.fromARGB(255, 3, 23, 40).withOpacity(0.3),
+                                                          color: const Color
+                                                                  .fromARGB(255,
+                                                                  3, 23, 40)
+                                                              .withOpacity(0.3),
                                                           blurRadius: 15,
-                                                          offset: const Offset(0, 8),
+                                                          offset: const Offset(
+                                                              0, 8),
                                                         ),
                                                         BoxShadow(
-                                                          color: Colors.white.withOpacity(0.2),
+                                                          color: Colors.white
+                                                              .withOpacity(0.2),
                                                           blurRadius: 1,
-                                                          offset: const Offset(0, 1),
+                                                          offset: const Offset(
+                                                              0, 1),
                                                         ),
                                                       ],
                                                     ),
                                                     child: ElevatedButton(
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor: Colors.transparent,
-                                                        shadowColor: Colors.transparent,
-                                                        shape: const StadiumBorder(),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        shadowColor:
+                                                            Colors.transparent,
+                                                        shape:
+                                                            const StadiumBorder(),
                                                         elevation: 0,
                                                       ),
                                                       onPressed: () async {
-                                                        if (_signupFormKey.currentState?.validate() ?? false) {
-                                                          await controller.signupUser(context);
+                                                        if (_signupFormKey
+                                                                .currentState
+                                                                ?.validate() ??
+                                                            false) {
+                                                          await controller
+                                                              .signupUser(
+                                                                  context);
                                                         }
                                                       },
-                                                      child: controller.isLoading.value
+                                                      child: controller
+                                                              .isLoading.value
                                                           ? const LoadingIndicator()
                                                           : const Text(
-                                                        'Continue',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.w600,
-                                                          letterSpacing: 0.5,
-                                                        ),
-                                                      ),
+                                                              'Continue',
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                letterSpacing:
+                                                                    0.5,
+                                                              ),
+                                                            ),
                                                     ),
                                                   ),
 
@@ -548,7 +682,8 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                               // Login button section - Only show when keyboard is not visible
                               if (keyboardHeight == 0)
                                 Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 20),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -568,20 +703,25 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                                           Get.offAll(() => const LoginView());
                                         },
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                             gradient: LinearGradient(
                                               colors: [
-                                                Colors.orange.shade300.withOpacity(0.9),
-                                                Colors.orange.shade300.withOpacity(0.7),
+                                                Colors.orange.shade300
+                                                    .withOpacity(0.9),
+                                                Colors.orange.shade300
+                                                    .withOpacity(0.7),
                                               ],
                                             ),
                                           ),
                                           child: Text(
                                             AppString.login,
                                             style: const TextStyle(
-                                              color: Color.fromARGB(255, 2, 39, 69),
+                                              color: Color.fromARGB(
+                                                  255, 2, 39, 69),
                                               fontSize: 19,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -662,7 +802,8 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
                 fontSize: 14,
               ),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               filled: true,
               fillColor: Colors.transparent,
             ),

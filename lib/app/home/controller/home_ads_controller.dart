@@ -3,8 +3,8 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:s_medi/app/auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/app/auth/controller/token_controller.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 class HomeAd {
   final int id;
@@ -54,9 +54,11 @@ class HomeAdsController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
+        final Map<String, dynamic> data =
+            jsonDecode(response.body) as Map<String, dynamic>;
         final List<dynamic> items = data['items'] as List<dynamic>? ?? [];
-        ads.assignAll(items.map((item) => HomeAd.fromJson(item as Map<String, dynamic>)));
+        ads.assignAll(
+            items.map((item) => HomeAd.fromJson(item as Map<String, dynamic>)));
       } else {
         errorMessage.value = 'Failed to load ads (${response.statusCode}).';
       }
@@ -67,4 +69,3 @@ class HomeAdsController extends GetxController {
     }
   }
 }
-

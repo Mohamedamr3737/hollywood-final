@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_medi/general/consts/consts.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 
 class SignupController extends GetxController {
   var nameController = TextEditingController();
@@ -34,16 +34,13 @@ class SignupController extends GetxController {
       );
       final responseData = jsonDecode(response.body);
       if (responseData['status']) {
-        print(responseData['status']);
-
         // Assuming the API returns a success message
         AlertService.success(context, 'Signup Successful!');
       } else {
-        print(responseData);
-
         String errorMessage = 'Signup Failed!';
 
-        if (responseData['message'] is Map && responseData['message'].isNotEmpty) {
+        if (responseData['message'] is Map &&
+            responseData['message'].isNotEmpty) {
           // Get the first error message dynamically
           var firstKey = responseData['message'].keys.first;
           var firstError = responseData['message'][firstKey];
@@ -56,7 +53,6 @@ class SignupController extends GetxController {
 
         AlertService.error(context, errorMessage);
       }
-
     } catch (e) {
       AlertService.error(context, 'An error occurred. Please try again later.');
     } finally {

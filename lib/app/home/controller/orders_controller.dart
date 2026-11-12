@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 class OrdersController extends GetxController {
   var isLoading = false.obs;
@@ -49,10 +49,7 @@ class OrdersController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-
         final jsonData = json.decode(response.body);
-        print(";;;;;;;;;;;;;;;;;;;;");
-        print(jsonData);
         if (jsonData["data"] != null) {
           final dataArr = jsonData["data"] as List<dynamic>;
           final parsed = dataArr.map((order) {
@@ -86,7 +83,8 @@ class OrdersController extends GetxController {
           orders.clear();
         }
       } else {
-        errorMessage.value = "Error: ${response.statusCode} - ${response.reasonPhrase}";
+        errorMessage.value =
+            "Error: ${response.statusCode} - ${response.reasonPhrase}";
       }
     } catch (e) {
       errorMessage.value = "Exception: $e";

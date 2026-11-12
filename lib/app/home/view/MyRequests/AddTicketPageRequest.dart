@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../controller/requests_controller.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 import '../../../../general/consts/consts.dart';
 
 class AddTicketPage extends StatefulWidget {
@@ -31,8 +31,6 @@ class _AddTicketPageState extends State<AddTicketPage> {
     _detailsCtrl.dispose();
     super.dispose();
   }
-
-
 
   Future<void> _pickDocument() async {
     final result = await FilePicker.platform.pickFiles(
@@ -85,11 +83,11 @@ class _AddTicketPageState extends State<AddTicketPage> {
       );
 
       // On success, the server returns { "data": { "id":..., "status":..., ... }, "status":true }
-      final newTicket = responseJson['data']; // e.g. { "id":59, "status":"open", ... }
+      final newTicket =
+          responseJson['data']; // e.g. { "id":59, "status":"open", ... }
 
       // Return the newly created ticket data to the previous page
       Navigator.of(context).pop(newTicket);
-
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -114,7 +112,8 @@ class _AddTicketPageState extends State<AddTicketPage> {
                 width: double.infinity,
                 height: 150,
                 child: Image.network(
-                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,
+                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),
@@ -122,31 +121,29 @@ class _AddTicketPageState extends State<AddTicketPage> {
           ),
           // Lotus
           Positioned(
-            top: 110,
-            left: MediaQuery.of(context).size.width / 2 - 70,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+              top: 110,
+              left: MediaQuery.of(context).size.width / 2 - 70,
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
+                    ),
+                    fit: BoxFit.cover,
                   ),
-                ],
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
-                  ),
-                  fit: BoxFit.cover,
                 ),
-              ),
-            )
-
-          ),
+              )),
           // AppBar
           Positioned(
             top: 0,
@@ -230,7 +227,8 @@ class _AddTicketPageState extends State<AddTicketPage> {
                             ),
                           ),
                           onPressed: _pickDocument,
-                          child: const Text("Document", style: TextStyle(color: Colors.white)),
+                          child: const Text("Document",
+                              style: TextStyle(color: Colors.white)),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
@@ -241,7 +239,8 @@ class _AddTicketPageState extends State<AddTicketPage> {
                             ),
                           ),
                           onPressed: _pickMedia,
-                          child: const Text("Media", style: TextStyle(color: Colors.white)),
+                          child: const Text("Media",
+                              style: TextStyle(color: Colors.white)),
                         ),
                       ],
                     ),

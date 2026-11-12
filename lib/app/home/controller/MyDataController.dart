@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 // -----------------------------
 // Model Classes
@@ -59,7 +59,7 @@ class DataResponse {
   factory DataResponse.fromJson(Map<String, dynamic> json) {
     var list = json['my_data'] as List;
     List<DataItem> myDataList =
-    list.map((item) => DataItem.fromJson(item)).toList();
+        list.map((item) => DataItem.fromJson(item)).toList();
 
     return DataResponse(
       myData: myDataList,
@@ -86,11 +86,9 @@ class Category {
 /// Controller class to fetch categories
 /// -----------------------------------------
 class MyDataController {
-
   Future<List<Category>> fetchCategories() async {
-    String? token= await getAccessToken();
-    final String apiUrl =
-        '${ApiConfig.baseUrl}/api/patient/my-data/categories';
+    String? token = await getAccessToken();
+    final String apiUrl = '${ApiConfig.baseUrl}/api/patient/my-data/categories';
 
     final response = await http.get(
       Uri.parse(apiUrl),
@@ -115,9 +113,7 @@ class MyDataController {
   }
 
   Future<DataResponse> fetchData(int categoryId) async {
-    String? token= await getAccessToken();
-    print("clicked");
-    print(categoryId);
+    String? token = await getAccessToken();
     final String apiUrl =
         '${ApiConfig.baseUrl}/api/patient/my-data/data?category_id=$categoryId';
 
@@ -128,12 +124,9 @@ class MyDataController {
         'Content-Type': 'application/json',
       },
     );
-    print('objectzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz');
-    print(response);
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonBody = json.decode(response.body);
-      print('objectzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz');
-      print(jsonBody);
       if (jsonBody['status'] == true) {
         return DataResponse.fromJson(jsonBody['data']);
       } else {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 import '../../../../general/consts/consts.dart';
 
 class MedicationDetailPage extends StatefulWidget {
@@ -46,7 +46,8 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
   Widget build(BuildContext context) {
     // Extract data from the prescription map
     final docName = widget.prescription['doctor']?['name'] ?? 'Unknown Doctor';
-    final medications = widget.prescription['medications'] as List<dynamic>? ?? [];
+    final medications =
+        widget.prescription['medications'] as List<dynamic>? ?? [];
 
     return Scaffold(
       // Same background style
@@ -59,7 +60,8 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
                 height: 150,
                 width: double.infinity,
                 child: Image.network(
-                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,
+                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),
@@ -67,31 +69,29 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
           ),
           // lotus icon
           Positioned(
-            top: 110,
-            left: MediaQuery.of(context).size.width / 2 - 70,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+              top: 110,
+              left: MediaQuery.of(context).size.width / 2 - 70,
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
+                    ),
+                    fit: BoxFit.cover,
                   ),
-                ],
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
-                  ),
-                  fit: BoxFit.cover,
                 ),
-              ),
-            )
-
-          ),
+              )),
           // custom appbar
           Positioned(
             top: 0,
@@ -120,79 +120,81 @@ class _MedicationDetailPageState extends State<MedicationDetailPage> {
             top: 240,
             child: medications.isEmpty
                 ? const Center(
-              child: Text(
-                "No Medication Found!",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            )
-                : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: medications.length,
-              itemBuilder: (ctx, i) {
-                final medItem = medications[i];
-                final medName = medItem['medication_name'] ?? '';
-                final times = medItem['times']?.toString() ?? '';
-                final form = medItem['form'] ?? '';
-                final comment = medItem['comment'] ?? '';
-
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Medication
-                        Text(
-                          "Medication\n$medName",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        // Times, Form
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Times\n$times"),
-                            Text("Form\n$form"),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        // Comment
-                        Text(
-                          "Comment\n$comment",
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(height: 12),
-                        // "Set A Reminder" button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _setReminder,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
-                            child: const Text(
-                              "Set A Reminder",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
+                    child: Text(
+                      "No Medication Found!",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: medications.length,
+                    itemBuilder: (ctx, i) {
+                      final medItem = medications[i];
+                      final medName = medItem['medication_name'] ?? '';
+                      final times = medItem['times']?.toString() ?? '';
+                      final form = medItem['form'] ?? '';
+                      final comment = medItem['comment'] ?? '';
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Medication
+                              Text(
+                                "Medication\n$medName",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              // Times, Form
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Times\n$times"),
+                                  Text("Form\n$form"),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              // Comment
+                              Text(
+                                "Comment\n$comment",
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                              const SizedBox(height: 12),
+                              // "Set A Reminder" button
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _setReminder,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                  ),
+                                  child: const Text(
+                                    "Set A Reminder",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),

@@ -1,13 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print
 
 import 'dart:ui';
-import 'package:s_medi/about/about.dart';
-import 'package:s_medi/app/auth/controller/login_controller.dart';
-import 'package:s_medi/app/auth/view/MainPage.dart';
+import 'package:hollywoodapp/about/about.dart';
+import 'package:hollywoodapp/app/auth/controller/login_controller.dart';
+import 'package:hollywoodapp/app/auth/view/MainPage.dart';
 // ignore: unused_import
-import 'package:s_medi/app/widgets/coustom_textfield.dart';
-import 'package:s_medi/general/consts/consts.dart';
-import 'package:s_medi/serv/servicespage.dart';
+import 'package:hollywoodapp/app/widgets/coustom_textfield.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
+import 'package:hollywoodapp/serv/servicespage.dart';
 import '../reset_password/reset_password.dart';
 import '../../widgets/loading_indicator.dart';
 import 'signup_page.dart';
@@ -25,7 +25,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   final ScrollController _scrollController = ScrollController();
-  
+
   // Create a unique form key for this specific login view
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
@@ -137,7 +137,9 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                       physics: const ClampingScrollPhysics(),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          minHeight: keyboardHeight > 0 ? availableHeight : screenHeight,
+                          minHeight: keyboardHeight > 0
+                              ? availableHeight
+                              : screenHeight,
                           minWidth: screenWidth,
                         ),
                         child: Padding(
@@ -147,7 +149,9 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                           child: Column(
                             children: [
                               // Top safe area padding
-                              SizedBox(height: MediaQuery.of(context).padding.top + 20),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).padding.top + 20),
 
                               Padding(
                                 padding: const EdgeInsets.all(8),
@@ -155,9 +159,10 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                   children: [
                                     // Image section with adaptive height
                                     AnimatedContainer(
-                                      duration: const Duration(milliseconds: 300),
-                                      height: keyboardHeight > 0 
-                                          ? availableHeight * 0.12 
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      height: keyboardHeight > 0
+                                          ? availableHeight * 0.12
                                           : availableHeight * 0.25,
                                       width: double.infinity,
                                       child: Container(
@@ -167,12 +172,14 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.15),
+                                              color: Colors.black
+                                                  .withOpacity(0.15),
                                               blurRadius: 25,
                                               offset: const Offset(0, 12),
                                             ),
                                             BoxShadow(
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                               blurRadius: 8,
                                               offset: const Offset(0, -3),
                                             ),
@@ -181,7 +188,8 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
-                                            borderRadius: const BorderRadius.only(
+                                            borderRadius:
+                                                const BorderRadius.only(
                                               bottomLeft: Radius.circular(50),
                                             ),
                                             gradient: LinearGradient(
@@ -196,12 +204,14 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                               stops: const [0.0, 0.3, 0.7, 1.0],
                                             ),
                                             border: Border.all(
-                                              color: Colors.white.withOpacity(0.9),
+                                              color:
+                                                  Colors.white.withOpacity(0.9),
                                               width: 1.5,
                                             ),
                                           ),
                                           child: ClipRRect(
-                                            borderRadius: const BorderRadius.only(
+                                            borderRadius:
+                                                const BorderRadius.only(
                                               bottomLeft: Radius.circular(46),
                                             ),
                                             child: Stack(
@@ -211,11 +221,14 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                                   child: Image.network(
                                                     'https://st5.depositphotos.com/62628780/65781/i/450/depositphotos_657816120-stock-photo-natural-hair-sunflower-portrait-black.jpg',
                                                     fit: BoxFit.cover,
-                                                    errorBuilder: (context, error, stackTrace) {
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
                                                       return Container(
-                                                        color: Colors.grey.shade300,
+                                                        color: Colors
+                                                            .grey.shade300,
                                                         child: const Center(
-                                                          child: Icon(Icons.image_not_supported),
+                                                          child: Icon(Icons
+                                                              .image_not_supported),
                                                         ),
                                                       );
                                                     },
@@ -225,19 +238,31 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                                 Positioned.fill(
                                                   child: Container(
                                                     decoration: BoxDecoration(
-                                                      borderRadius: const BorderRadius.only(
-                                                        bottomLeft: Radius.circular(46),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .only(
+                                                        bottomLeft:
+                                                            Radius.circular(46),
                                                       ),
                                                       gradient: LinearGradient(
-                                                        begin: Alignment.topLeft,
-                                                        end: Alignment.bottomRight,
+                                                        begin:
+                                                            Alignment.topLeft,
+                                                        end: Alignment
+                                                            .bottomRight,
                                                         colors: [
-                                                          Colors.white.withOpacity(0.3),
+                                                          Colors.white
+                                                              .withOpacity(0.3),
                                                           Colors.transparent,
                                                           Colors.transparent,
-                                                          Colors.black.withOpacity(0.1),
+                                                          Colors.black
+                                                              .withOpacity(0.1),
                                                         ],
-                                                        stops: const [0.0, 0.3, 0.7, 1.0],
+                                                        stops: const [
+                                                          0.0,
+                                                          0.3,
+                                                          0.7,
+                                                          1.0
+                                                        ],
                                                       ),
                                                     ),
                                                   ),
@@ -252,8 +277,10 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                                     decoration: BoxDecoration(
                                                       gradient: LinearGradient(
                                                         colors: [
-                                                          Colors.white.withOpacity(0.9),
-                                                          Colors.white.withOpacity(0.3),
+                                                          Colors.white
+                                                              .withOpacity(0.9),
+                                                          Colors.white
+                                                              .withOpacity(0.3),
                                                         ],
                                                       ),
                                                     ),
@@ -271,8 +298,10 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                     // Welcome text with glassmorphism container
                                     Container(
                                       width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 16),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 16),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         gradient: LinearGradient(
@@ -289,7 +318,8 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.05),
+                                            color:
+                                                Colors.black.withOpacity(0.05),
                                             blurRadius: 15,
                                             offset: const Offset(0, 8),
                                           ),
@@ -298,13 +328,15 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(20),
                                         child: BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                          filter: ImageFilter.blur(
+                                              sigmaX: 10, sigmaY: 10),
                                           child: Text(
                                             'Welcome to Hollywood Clinic',
                                             style: TextStyle(
                                               fontSize: 24,
                                               fontWeight: FontWeight.w600,
-                                              color: Colors.black.withOpacity(0.8),
+                                              color:
+                                                  Colors.black.withOpacity(0.8),
                                               letterSpacing: -0.5,
                                             ),
                                             textAlign: TextAlign.center,
@@ -318,8 +350,10 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                     // Form container - Use unique form key
                                     Container(
                                       width: double.infinity,
-                                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 24),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(25),
                                         gradient: LinearGradient(
@@ -336,12 +370,14 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.1),
+                                            color:
+                                                Colors.black.withOpacity(0.1),
                                             blurRadius: 20,
                                             offset: const Offset(0, 10),
                                           ),
                                           BoxShadow(
-                                            color: Colors.white.withOpacity(0.8),
+                                            color:
+                                                Colors.white.withOpacity(0.8),
                                             blurRadius: 1,
                                             offset: const Offset(0, 1),
                                           ),
@@ -350,26 +386,33 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(25),
                                         child: BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                                          filter: ImageFilter.blur(
+                                              sigmaX: 15, sigmaY: 15),
                                           child: Form(
-                                            key: _loginFormKey, // Use local form key
+                                            key:
+                                                _loginFormKey, // Use local form key
                                             child: Column(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 // Phone number field
                                                 _buildGlassmorphismTextField(
-                                                  controller: controller.emailController,
-                                                  validator: controller.validateemail,
+                                                  controller: controller
+                                                      .emailController,
+                                                  validator:
+                                                      controller.validateemail,
                                                   icon: Icons.phone,
-                                                  hint: "Enter your phone number",
+                                                  hint:
+                                                      "Enter your phone number",
                                                 ),
 
                                                 const SizedBox(height: 16),
 
                                                 // Password field
                                                 _buildGlassmorphismTextField(
-                                                  controller: controller.passwordController,
-                                                  validator: controller.validpass,
+                                                  controller: controller
+                                                      .passwordController,
+                                                  validator:
+                                                      controller.validpass,
                                                   icon: Icons.key,
                                                   hint: AppString.passwordHint,
                                                   isPassword: true,
@@ -379,32 +422,47 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
 
                                                 // Forget password link
                                                 Align(
-                                                  alignment: Alignment.centerRight,
+                                                  alignment:
+                                                      Alignment.centerRight,
                                                   child: GestureDetector(
                                                     onTap: () {
-                                                      Get.to(() => const UsernameResetPage());
+                                                      Get.to(() =>
+                                                          const UsernameResetPage());
                                                     },
                                                     child: Container(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 6),
                                                       decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(15),
-                                                        gradient: LinearGradient(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        gradient:
+                                                            LinearGradient(
                                                           colors: [
-                                                            Colors.white.withOpacity(0.2),
-                                                            Colors.white.withOpacity(0.05),
+                                                            Colors.white
+                                                                .withOpacity(
+                                                                    0.2),
+                                                            Colors.white
+                                                                .withOpacity(
+                                                                    0.05),
                                                           ],
                                                         ),
                                                         border: Border.all(
-                                                          color: Colors.white.withOpacity(0.1),
+                                                          color: Colors.white
+                                                              .withOpacity(0.1),
                                                           width: 1,
                                                         ),
                                                       ),
                                                       child: Text(
                                                         "Forget Password ?",
                                                         style: TextStyle(
-                                                          color: Colors.black.withOpacity(0.7),
+                                                          color: Colors.black
+                                                              .withOpacity(0.7),
                                                           fontSize: 13,
-                                                          fontWeight: FontWeight.w500,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                         ),
                                                       ),
                                                     ),
@@ -415,54 +473,80 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
 
                                                 // Login button
                                                 Container(
-                                                  width: MediaQuery.of(context).size.width * 0.75,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.75,
                                                   height: 50,
                                                   decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(25),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            25),
                                                     gradient: LinearGradient(
                                                       begin: Alignment.topLeft,
-                                                      end: Alignment.bottomRight,
+                                                      end:
+                                                          Alignment.bottomRight,
                                                       colors: [
-                                                        Colors.black.withOpacity(0.9),
-                                                        Colors.black.withOpacity(0.7),
+                                                        Colors.black
+                                                            .withOpacity(0.9),
+                                                        Colors.black
+                                                            .withOpacity(0.7),
                                                       ],
                                                     ),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                        color: Colors.black.withOpacity(0.3),
+                                                        color: Colors.black
+                                                            .withOpacity(0.3),
                                                         blurRadius: 15,
-                                                        offset: const Offset(0, 8),
+                                                        offset:
+                                                            const Offset(0, 8),
                                                       ),
                                                       BoxShadow(
-                                                        color: Colors.white.withOpacity(0.2),
+                                                        color: Colors.white
+                                                            .withOpacity(0.2),
                                                         blurRadius: 1,
-                                                        offset: const Offset(0, 1),
+                                                        offset:
+                                                            const Offset(0, 1),
                                                       ),
                                                     ],
                                                   ),
                                                   child: ElevatedButton(
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.transparent,
-                                                      shadowColor: Colors.transparent,
-                                                      shape: const StadiumBorder(),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      shadowColor:
+                                                          Colors.transparent,
+                                                      shape:
+                                                          const StadiumBorder(),
                                                       elevation: 0,
                                                     ),
                                                     onPressed: () async {
-                                                      if (_loginFormKey.currentState?.validate() ?? false) {
-                                                        await controller.loginUser(context);
+                                                      if (_loginFormKey
+                                                              .currentState
+                                                              ?.validate() ??
+                                                          false) {
+                                                        await controller
+                                                            .loginUser(context);
                                                       }
                                                     },
-                                                    child: controller.isLoading.value
+                                                    child: controller
+                                                            .isLoading.value
                                                         ? const LoadingIndicator()
                                                         : Text(
-                                                      AppString.login,
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w600,
-                                                        letterSpacing: 0.5,
-                                                      ),
-                                                    ),
+                                                            AppString.login,
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              letterSpacing:
+                                                                  0.5,
+                                                            ),
+                                                          ),
                                                   ),
                                                 ),
 
@@ -470,12 +554,14 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
 
                                                 // Sign up link
                                                 Row(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Text(
                                                       AppString.dontHaveAccount,
                                                       style: TextStyle(
-                                                        color: Colors.black.withOpacity(0.6),
+                                                        color: Colors.black
+                                                            .withOpacity(0.6),
                                                         fontSize: 13,
                                                       ),
                                                     ),
@@ -483,26 +569,49 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                                     GestureDetector(
                                                       onTap: () {
                                                         // Properly dispose current controller before navigation
-                                                        Get.delete<LoginController>();
-                                                        Get.offAll(() => const SignupView());
+                                                        Get.delete<
+                                                            LoginController>();
+                                                        Get.offAll(() =>
+                                                            const SignupView());
                                                       },
                                                       child: Container(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                          gradient: LinearGradient(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 8,
+                                                                vertical: 4),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          gradient:
+                                                              LinearGradient(
                                                             colors: [
-                                                              Colors.orange.shade300.withOpacity(0.9),
-                                                              Colors.orange.shade300.withOpacity(0.7),
+                                                              Colors.orange
+                                                                  .shade300
+                                                                  .withOpacity(
+                                                                      0.9),
+                                                              Colors.orange
+                                                                  .shade300
+                                                                  .withOpacity(
+                                                                      0.7),
                                                             ],
                                                           ),
                                                         ),
                                                         child: Text(
                                                           AppString.signup,
-                                                          style: const TextStyle(
-                                                            color: Color.fromARGB(255, 2, 39, 69),
+                                                          style:
+                                                              const TextStyle(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    2,
+                                                                    39,
+                                                                    69),
                                                             fontSize: 19,
-                                                            fontWeight: FontWeight.w600,
+                                                            fontWeight:
+                                                                FontWeight.w600,
                                                           ),
                                                         ),
                                                       ),
@@ -534,7 +643,8 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                     right: 0,
                     child: Container(
                       width: screenWidth,
-                      margin: const EdgeInsets.only(left: 8, right: 8, bottom: 0),
+                      margin:
+                          const EdgeInsets.only(left: 8, right: 8, bottom: 0),
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(25),
@@ -563,7 +673,8 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                               left: 20,
                               right: 20,
                               top: 16,
-                              bottom: MediaQuery.of(context).padding.bottom + 16,
+                              bottom:
+                                  MediaQuery.of(context).padding.bottom + 16,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.3),
@@ -585,7 +696,8 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                             ),
                             child: IntrinsicHeight(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   _buildNavItem(
                                     icon: Icons.group,
@@ -594,7 +706,9 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                       _onNavTap();
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => ServicesPage()),
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ServicesPage()),
                                       );
                                     },
                                   ),
@@ -605,7 +719,8 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                       _onNavTap();
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => MainPage()),
+                                        MaterialPageRoute(
+                                            builder: (context) => MainPage()),
                                       );
                                     },
                                     child: AnimatedBuilder(
@@ -627,12 +742,14 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                                 ],
                                               ),
                                               border: Border.all(
-                                                color: Colors.white.withOpacity(0.3),
+                                                color: Colors.white
+                                                    .withOpacity(0.3),
                                                 width: 2,
                                               ),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black.withOpacity(0.1),
+                                                  color: Colors.black
+                                                      .withOpacity(0.1),
                                                   blurRadius: 15,
                                                   offset: const Offset(0, 5),
                                                 ),
@@ -640,21 +757,29 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                             ),
                                             child: ClipOval(
                                               child: BackdropFilter(
-                                                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                filter: ImageFilter.blur(
+                                                    sigmaX: 10, sigmaY: 10),
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: Colors.white.withOpacity(0.1),
+                                                    color: Colors.white
+                                                        .withOpacity(0.1),
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: ClipRRect(
-                                                    borderRadius: BorderRadius.circular(30),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            30),
                                                     child: Image.network(
                                                       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQa85Mr3rqsBeXwpHZKrCQiyIXjXySFQIRkWBCkpbMXXHPfkps',
                                                       width: 35,
                                                       height: 35,
                                                       fit: BoxFit.contain,
-                                                      errorBuilder: (context, error, stackTrace) {
-                                                        return const Icon(Icons.home, color: Colors.black54);
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return const Icon(
+                                                            Icons.home,
+                                                            color:
+                                                                Colors.black54);
                                                       },
                                                     ),
                                                   ),
@@ -674,7 +799,8 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                       _onNavTap();
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => AboutPage()),
+                                        MaterialPageRoute(
+                                            builder: (context) => AboutPage()),
                                       );
                                     },
                                   ),
@@ -751,7 +877,8 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                 fontSize: 15,
               ),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               filled: true,
               fillColor: Colors.transparent,
             ),

@@ -2,10 +2,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 class DietController {
-
   // 1) Fetch the list of diet plans
   Future<List<dynamic>> fetchDietPlans() async {
     final bearerToken = await getAccessToken();
@@ -30,7 +29,8 @@ class DietController {
   // 2) Fetch the days for a specific diet ID
   Future<List<dynamic>> fetchDietDays(int dietId) async {
     final bearerToken = await getAccessToken();
-    final url = "${ApiConfig.baseUrl}/api/patient/prescription/diet-days/?diet_id=$dietId";
+    final url =
+        "${ApiConfig.baseUrl}/api/patient/prescription/diet-days/?diet_id=$dietId";
 
     final response = await http.get(
       Uri.parse(url),

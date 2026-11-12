@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 class ShopController extends GetxController {
   var isLoading = false.obs;
@@ -129,8 +129,7 @@ class ShopController extends GetxController {
           }).toList();
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   /// Send the cart items to the /api/patient/shop/store endpoint.
@@ -149,7 +148,8 @@ class ShopController extends GetxController {
       final List<Map<String, dynamic>> productList = cartItems.map((item) {
         final product = item["product"] as Map<String, dynamic>;
         final quantity = item["quantity"] as int;
-        final productId = product["id"] as int; // Make sure your product has "id"
+        final productId =
+            product["id"] as int; // Make sure your product has "id"
         return {
           "id": productId,
           "qty": quantity,

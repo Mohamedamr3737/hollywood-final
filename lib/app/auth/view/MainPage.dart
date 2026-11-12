@@ -4,12 +4,12 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:s_medi/about/about.dart';
-import 'package:s_medi/app/home/view/Shop/ShopView.dart';
-import 'package:s_medi/app/home/view/home_screen.dart';
-import 'package:s_medi/serv/servicespage.dart';
-import 'package:s_medi/app/home/view/home.dart';
-import 'package:s_medi/app/home/view/Sessions/MySessionsPage.dart';
+import 'package:hollywoodapp/about/about.dart';
+import 'package:hollywoodapp/app/home/view/Shop/ShopView.dart';
+import 'package:hollywoodapp/app/home/view/home_screen.dart';
+import 'package:hollywoodapp/serv/servicespage.dart';
+import 'package:hollywoodapp/app/home/view/home.dart';
+import 'package:hollywoodapp/app/home/view/Sessions/MySessionsPage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -127,7 +127,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   type: BottomNavigationBarType.fixed,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  selectedItemColor: const Color(0xFFFFB74D) // same as Colors.orange[300]
+                  selectedItemColor:
+                      const Color(0xFFFFB74D) // same as Colors.orange[300]
                   ,
                   unselectedItemColor: Colors.black.withOpacity(0.6),
                   showUnselectedLabels: true,
@@ -148,9 +149,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         padding: EdgeInsets.all(_selectedIndex == 0 ? 8 : 4),
                         decoration: _selectedIndex == 0
                             ? BoxDecoration(
-                          color: const Color(0xFF007AFF).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        )
+                                color: const Color(0xFF007AFF).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              )
                             : null,
                         child: Icon(
                           Icons.group,
@@ -165,9 +166,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         padding: EdgeInsets.all(_selectedIndex == 1 ? 8 : 4),
                         decoration: _selectedIndex == 1
                             ? BoxDecoration(
-                          color: const Color(0xFF007AFF).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        )
+                                color: const Color(0xFF007AFF).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              )
                             : null,
                         child: Icon(
                           Icons.info_outline,
@@ -181,15 +182,19 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         animation: _scaleAnimation,
                         builder: (context, child) {
                           return Transform.scale(
-                            scale: _selectedIndex == 2 ? _scaleAnimation.value : 1.0,
+                            scale: _selectedIndex == 2
+                                ? _scaleAnimation.value
+                                : 1.0,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
-                              padding: EdgeInsets.all(_selectedIndex == 2 ? 8 : 4),
+                              padding:
+                                  EdgeInsets.all(_selectedIndex == 2 ? 8 : 4),
                               decoration: _selectedIndex == 2
                                   ? BoxDecoration(
-                                color: const Color(0xFF007AFF).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              )
+                                      color: const Color(0xFF007AFF)
+                                          .withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    )
                                   : null,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
@@ -212,9 +217,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         padding: EdgeInsets.all(_selectedIndex == 3 ? 8 : 4),
                         decoration: _selectedIndex == 3
                             ? BoxDecoration(
-                          color: const Color(0xFF007AFF).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        )
+                                color: const Color(0xFF007AFF).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              )
                             : null,
                         child: Icon(
                           Icons.shopping_bag_outlined,
@@ -229,9 +234,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         padding: EdgeInsets.all(_selectedIndex == 4 ? 8 : 4),
                         decoration: _selectedIndex == 4
                             ? BoxDecoration(
-                          color: const Color(0xFF007AFF).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        )
+                                color: const Color(0xFF007AFF).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              )
                             : null,
                         child: Icon(
                           Icons.event_note_outlined,

@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../controller/diet_controller.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 import '../../../../general/consts/consts.dart';
 
 class MyMealsPage extends StatefulWidget {
-  final int dayNum;   // The selected day (e.g. 1, 2, 3, etc.)
-  final int dietId;   // The current diet ID
+  final int dayNum; // The selected day (e.g. 1, 2, 3, etc.)
+  final int dietId; // The current diet ID
 
   // Make sure you pass both dayNum and dietId when navigating:
   // Navigator.of(context).push(MaterialPageRoute(
@@ -20,7 +20,8 @@ class MyMealsPage extends StatefulWidget {
   State<MyMealsPage> createState() => _MyMealsPageState();
 }
 
-class _MyMealsPageState extends State<MyMealsPage> with SingleTickerProviderStateMixin {
+class _MyMealsPageState extends State<MyMealsPage>
+    with SingleTickerProviderStateMixin {
   late DietController _dietController;
   late TabController _tabController;
 
@@ -46,9 +47,9 @@ class _MyMealsPageState extends State<MyMealsPage> with SingleTickerProviderStat
       // e.g. {"id":1,"title":"Breakfast"}
       _dietTimes = timesList
           .map((item) => {
-        'id': item['id'],
-        'title': item['title'],
-      })
+                'id': item['id'],
+                'title': item['title'],
+              })
           .toList();
 
       // Create the TabController with the number of times we have
@@ -73,7 +74,8 @@ class _MyMealsPageState extends State<MyMealsPage> with SingleTickerProviderStat
       initialTime: TimeOfDay.now(),
     );
     if (pickedTime != null) {
-      AlertService.success(context, "Reminder set at ${pickedTime.format(context)}");
+      AlertService.success(
+          context, "Reminder set at ${pickedTime.format(context)}");
     }
   }
 
@@ -93,7 +95,9 @@ class _MyMealsPageState extends State<MyMealsPage> with SingleTickerProviderStat
         labelColor: Colors.orangeAccent,
         unselectedLabelColor: Colors.white70,
         isScrollable: true,
-        tabs: _dietTimes.map((time) => Tab(text: time['title'].toString())).toList(),
+        tabs: _dietTimes
+            .map((time) => Tab(text: time['title'].toString()))
+            .toList(),
       ),
     );
   }
@@ -111,7 +115,8 @@ class _MyMealsPageState extends State<MyMealsPage> with SingleTickerProviderStat
                 height: 150,
                 width: double.infinity,
                 child: Image.network(
-                  AppAssets.placeholderImageUrl,                  fit: BoxFit.cover,
+                  AppAssets.placeholderImageUrl,
+                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 100),
@@ -119,31 +124,29 @@ class _MyMealsPageState extends State<MyMealsPage> with SingleTickerProviderStat
           ),
           // lotus
           Positioned(
-            top: 110,
-            left: MediaQuery.of(context).size.width / 2 - 70,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+              top: 110,
+              left: MediaQuery.of(context).size.width / 2 - 70,
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
+                    ),
+                    fit: BoxFit.cover,
                   ),
-                ],
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSEa7ew_3UY_z3gT_InqdQmimzJ6jC3n2WgRpMUN9yekVsUxGIg',
-                  ),
-                  fit: BoxFit.cover,
                 ),
-              ),
-            )
-
-          ),
+              )),
           // appBar
           Positioned(
             top: 0,
@@ -171,99 +174,104 @@ class _MyMealsPageState extends State<MyMealsPage> with SingleTickerProviderStat
           Positioned.fill(
             top: 260,
             child: _isLoadingTabs
-            // While loading the meal times, show a spinner
+                // While loading the meal times, show a spinner
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
-              children: [
-                // Tab bar at the top
-                _buildMealsTabBar(),
-                // For each tab, fetch the meals from the API
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: _dietTimes.map((time) {
-                      final dietTimeId = time['id'] as int;
-                      final tabTitle = time['title'] as String;
+                    children: [
+                      // Tab bar at the top
+                      _buildMealsTabBar(),
+                      // For each tab, fetch the meals from the API
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: _dietTimes.map((time) {
+                            final dietTimeId = time['id'] as int;
+                            final tabTitle = time['title'] as String;
 
-                      // Use a FutureBuilder to fetch the meals for each tab
-                      return FutureBuilder<List<dynamic>>(
-                        future: _dietController.fetchDietMeals(
-                          day: widget.dayNum,
-                          dietTime: dietTimeId,
-                          dietId: widget.dietId,
-                        ),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Text('Error: ${snapshot.error}'),
+                            // Use a FutureBuilder to fetch the meals for each tab
+                            return FutureBuilder<List<dynamic>>(
+                              future: _dietController.fetchDietMeals(
+                                day: widget.dayNum,
+                                dietTime: dietTimeId,
+                                dietId: widget.dietId,
+                              ),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+                                if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text('Error: ${snapshot.error}'),
+                                  );
+                                }
+                                final meals = snapshot.data ?? [];
+                                if (meals.isEmpty) {
+                                  return Center(
+                                      child: Text("No meals for $tabTitle."));
+                                }
+                                // Build a list of meal cards
+                                return ListView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: meals.length,
+                                  itemBuilder: (ctx, idx) {
+                                    final meal = meals[idx];
+                                    final title = meal['title'] ?? '';
+                                    final description =
+                                        meal['description'] ?? '';
+                                    final calories =
+                                        meal['calories']?.toString() ?? '0';
+
+                                    return Card(
+                                      margin: const EdgeInsets.only(bottom: 16),
+                                      child: ListTile(
+                                        title: Text(
+                                          description,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          "Calories\n$calories",
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
                             );
-                          }
-                          final meals = snapshot.data ?? [];
-                          if (meals.isEmpty) {
-                            return Center(child: Text("No meals for $tabTitle."));
-                          }
-                          // Build a list of meal cards
-                          return ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: meals.length,
-                            itemBuilder: (ctx, idx) {
-                              final meal = meals[idx];
-                              final title = meal['title'] ?? '';
-                              final description = meal['description'] ?? '';
-                              final calories = meal['calories']?.toString() ?? '0';
-
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                child: ListTile(
-                                  title: Text(
-                                    description,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    "Calories\n$calories",
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ),
-                // "Set A Reminder" button at bottom
-                SafeArea(
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    child: ElevatedButton(
-                      onPressed: _setReminder,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        "Set A Reminder",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          }).toList(),
                         ),
                       ),
-                    ),
+                      // "Set A Reminder" button at bottom
+                      SafeArea(
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          child: ElevatedButton(
+                            onPressed: _setReminder,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: const Text(
+                              "Set A Reminder",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         ],
       ),

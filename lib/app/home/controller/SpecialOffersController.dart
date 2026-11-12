@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 /// Model class for each offer item.
 class Offer {
@@ -30,8 +30,7 @@ class Offer {
   /// Factory constructor to parse JSON from the API.
   factory Offer.fromJson(Map<String, dynamic> json) {
     // Debug: Print the raw JSON to see what fields are available
-    print("Raw Offer JSON: $json");
-    
+
     // Try different possible field names for the body/content
     String bodyContent = "";
     if (json["body"] != null) {
@@ -43,13 +42,16 @@ class Offer {
     } else if (json["details"] != null) {
       bodyContent = json["details"].toString();
     }
-    
+
     return Offer(
       id: json["id"] ?? 0,
       title: json["title"] ?? "Untitled Offer",
       image: json["image"] ?? json["image_url"] ?? json["photo"] ?? "",
       type: json["type"] ?? "offer",
-      shortDescription: json["short_description"] ?? json["summary"] ?? json["description"] ?? "",
+      shortDescription: json["short_description"] ??
+          json["summary"] ??
+          json["description"] ??
+          "",
       body: bodyContent,
       registered: json["registered"] ?? false,
       startAt: json["start_at"] ?? "",
@@ -78,8 +80,6 @@ class SpecialOffersController {
         },
       );
 
-      print('API Response: ${response.body}');
-
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
 
@@ -87,7 +87,7 @@ class SpecialOffersController {
           // Handle different response formats for empty data
           dynamic data = jsonResponse['data'];
           List<dynamic> rawOffers = [];
-          
+
           if (data is List) {
             rawOffers = data;
           } else if (data is Map) {
@@ -104,8 +104,9 @@ class SpecialOffersController {
             // If data is null or other type, treat as empty
             rawOffers = [];
           }
-          
-          offers = rawOffers.map((jsonItem) => Offer.fromJson(jsonItem)).toList();
+
+          offers =
+              rawOffers.map((jsonItem) => Offer.fromJson(jsonItem)).toList();
           errorMessage = '';
           return offers;
         } else {
@@ -126,7 +127,8 @@ class SpecialOffersController {
   Future<bool> registerOffer(int offerId) async {
     try {
       String? bearerToken = await getAccessToken();
-      final String url = '${ApiConfig.baseUrl}/api/patient/offers/register-offer';
+      final String url =
+          '${ApiConfig.baseUrl}/api/patient/offers/register-offer';
 
       final response = await http.post(
         Uri.parse(url),
@@ -138,14 +140,13 @@ class SpecialOffersController {
         },
       );
 
-      print('Register Offer API Response: ${response.body}');
-
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse['status'] == true) {
           return true;
         } else {
-          errorMessage = jsonResponse['message'] ?? "Failed to register for offer.";
+          errorMessage =
+              jsonResponse['message'] ?? "Failed to register for offer.";
           return false;
         }
       } else {

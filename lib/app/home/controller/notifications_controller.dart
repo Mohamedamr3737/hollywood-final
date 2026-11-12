@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../auth/controller/token_controller.dart';
-import 'package:s_medi/general/consts/consts.dart';
+import 'package:hollywoodapp/general/consts/consts.dart';
 
 class NotificationItem {
   final int id;
@@ -74,7 +74,6 @@ class NotificationsController extends GetxController {
 
   // Mark a single notification as read
   Future<void> markAsRead(int notificationId) async {
-    print(notificationId);
     final String? bearerToken = await getAccessToken();
     final String url =
         '${ApiConfig.baseUrl}/api/patient/notifications/read?notification_id=$notificationId';
@@ -86,8 +85,6 @@ class NotificationsController extends GetxController {
         'Content-Type': 'application/json',
       },
     );
-
-    print(response.body);
 
     if (response.statusCode == 200) {
       final jsonBody = json.decode(response.body);
@@ -106,9 +103,9 @@ class NotificationsController extends GetxController {
   }
 
   Future<int> fetchUnreadCount() async {
-    print("function called");
     final String? bearerToken = await getAccessToken();
-    final String url = '${ApiConfig.baseUrl}/api/patient/notifications/unread-count';
+    final String url =
+        '${ApiConfig.baseUrl}/api/patient/notifications/unread-count';
 
     final response = await http.get(
       Uri.parse(url),
@@ -117,13 +114,9 @@ class NotificationsController extends GetxController {
         'Content-Type': 'application/json',
       },
     );
-    print(response.body);
-    print(response.statusCode);
 
     if (response.statusCode == 200) {
       int jsonBody = int.parse(response.body);
-      print("Unread Count:");
-      print(jsonBody);
       unreadCount.value = jsonBody;
       return jsonBody;
     } else {

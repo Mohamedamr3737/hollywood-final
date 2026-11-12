@@ -3,8 +3,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_medi/serv/ServicesPage.dart';
-import 'package:s_medi/serv/servicespage.dart';
+import 'package:hollywoodapp/serv/ServicesPage.dart';
+import 'package:hollywoodapp/serv/servicespage.dart';
 
 class ServiceDetailPage extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables

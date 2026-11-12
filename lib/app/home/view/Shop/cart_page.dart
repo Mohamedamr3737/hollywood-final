@@ -4,17 +4,19 @@ import 'package:get/get.dart';
 import 'dart:ui';
 import 'product_detail_page.dart';
 import '../../controller/shop_controller.dart';
-import 'package:s_medi/general/services/alert_service.dart';
+import 'package:hollywoodapp/general/services/alert_service.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({Key? key}) : super(key: key);
 
   // Use a reactive list instead of a plain list
-  static final RxList<Map<String, dynamic>> cartItems = <Map<String, dynamic>>[].obs;
+  static final RxList<Map<String, dynamic>> cartItems =
+      <Map<String, dynamic>>[].obs;
 
   // Add to cart method
   static void addToCart(Map<String, dynamic> product, int quantity) {
-    final index = cartItems.indexWhere((item) => item["product"]["id"] == product["id"]);
+    final index =
+        cartItems.indexWhere((item) => item["product"]["id"] == product["id"]);
     if (index >= 0) {
       // Increase quantity
       cartItems[index]["quantity"] += quantity;
@@ -108,7 +110,8 @@ class _CartPageState extends State<CartPage> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: kToolbarHeight + 40), // Account for transparent AppBar
+          const SizedBox(
+              height: kToolbarHeight + 40), // Account for transparent AppBar
           // Cart list
           Expanded(
             child: Obx(() {
@@ -221,9 +224,11 @@ class _CartPageState extends State<CartPage> {
                           children: [
                             _buildSummaryRow("Quantity", "$totalQuantity"),
                             const SizedBox(height: 8),
-                            _buildSummaryRow("SubTotal", "${subTotal.toStringAsFixed(1)} EGP"),
+                            _buildSummaryRow("SubTotal",
+                                "${subTotal.toStringAsFixed(1)} EGP"),
                             const SizedBox(height: 8),
-                            _buildSummaryRow("Discount", "${discountTotal.toStringAsFixed(1)} EGP"),
+                            _buildSummaryRow("Discount",
+                                "${discountTotal.toStringAsFixed(1)} EGP"),
                             const SizedBox(height: 12),
                             Container(
                               height: 1,
@@ -266,45 +271,46 @@ class _CartPageState extends State<CartPage> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 16),
                           ),
                           onPressed: CartPage.cartItems.isEmpty || _isSending
                               ? null
                               : () {
-                            _sendOrder();
-                          },
+                                  _sendOrder();
+                                },
                           child: _isSending
                               ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              Text(
-                                "Sending...",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          )
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      "Sending...",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                )
                               : const Text(
-                            "Send to Order",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
+                                  "Send to Order",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
                         ),
                       ),
                     ],
@@ -360,7 +366,8 @@ class _CartPageState extends State<CartPage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => ProductDetailPage(product: product)),
+                MaterialPageRoute(
+                    builder: (_) => ProductDetailPage(product: product)),
               ).then((_) => setState(() {}));
             },
             borderRadius: BorderRadius.circular(20),
@@ -442,10 +449,12 @@ class _CartPageState extends State<CartPage> {
                       children: [
                         _buildStepperButton(
                           icon: Icons.remove,
-                          onPressed: quantity > 1 ? () {
-                            item["quantity"] = quantity - 1;
-                            CartPage.cartItems.refresh();
-                          } : null,
+                          onPressed: quantity > 1
+                              ? () {
+                                  item["quantity"] = quantity - 1;
+                                  CartPage.cartItems.refresh();
+                                }
+                              : null,
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -510,7 +519,9 @@ class _CartPageState extends State<CartPage> {
       height: 40,
       margin: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: onPressed != null ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.2),
+        color: onPressed != null
+            ? Colors.white.withOpacity(0.4)
+            : Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Colors.white.withOpacity(0.3),
@@ -533,7 +544,8 @@ class _CartPageState extends State<CartPage> {
     setState(() => _isSending = true);
 
     final msg = await shopController.storeOrder(CartPage.cartItems);
-    if (msg.toLowerCase().contains("error") || msg.toLowerCase().contains("exception")) {
+    if (msg.toLowerCase().contains("error") ||
+        msg.toLowerCase().contains("exception")) {
       AlertService.error(context, msg);
     } else {
       AlertService.success(context, msg);
